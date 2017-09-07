@@ -4,7 +4,7 @@
 * Albert Thie (?)
 * Noël Lüneburg (s177315)
 
-### The main problem te be addressed
+### The main problem to be addressed
 Traffic control system on individual, or multiple intersections do not use signals from individual cars in a meaningful way, except for road sensors often placed in the proximity of traffic lights. There are proposed systems that do try to use these signals, in light of automation technology.
 
 ### State of the art
