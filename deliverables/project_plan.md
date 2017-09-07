@@ -1,7 +1,7 @@
 ## Traffic control system simulation
 #### Authors:
 * Elbert Fliek (s1917188)
-* Albert Thie (?)
+* Albert Thie (s1652184)
 * Noël Lüneburg (s177315)
 
 ### The main problem to be addressed
