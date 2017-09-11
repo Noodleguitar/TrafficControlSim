@@ -12,6 +12,7 @@ if not pygame.mixer:
 WIDTH = 640
 HEIGHT = 480
 FRAMERATE = 60
+CAR_EVERY_FRAMES = 60
 
 
 class SimMain:
@@ -29,8 +30,10 @@ class SimMain:
         self.screen = pygame.display.set_mode((
             self.width, self.height))
 
+        self.carframecounter = 0
+
     def MainLoop(self):
-        self.LoadSprites()
+        self.cars_sprites = pygame.sprite.Group()
 
         """Create the background"""
         self.background = pygame.Surface(self.screen.get_size())
@@ -38,6 +41,7 @@ class SimMain:
         self.background.fill((0, 0, 0))
 
         while 1:
+            self.maybe_add_car()
             for car in self.cars_sprites:
                 car.move()
 
@@ -48,9 +52,12 @@ class SimMain:
             pygame.display.flip()
             time.sleep(1.0 / FRAMERATE)
 
-    def LoadSprites(self):
-        self.cars_sprites = pygame.sprite.Group()
-        self.cars_sprites.add(Car(pygame.Rect(0, HEIGHT / 2, 64, 64)))
+    def maybe_add_car(self):
+        if self.carframecounter == 0:
+            self.cars_sprites.add(Car(pygame.Rect(0, HEIGHT / 2, 64, 64)))
+        self.carframecounter += 1
+        if self.carframecounter == CAR_EVERY_FRAMES:
+            self.carframecounter = 0
 
 
 class Car(pygame.sprite.Sprite):
@@ -73,8 +80,9 @@ class Car(pygame.sprite.Sprite):
 
         loc = self.rect.topleft
         if loc[0] > WIDTH:
-            xMove = -WIDTH
-        self.rect.move_ip(xMove, yMove)
+            self.kill()
+        else:
+            self.rect.move_ip(xMove, yMove)
 
 
 if __name__ == "__main__":
