@@ -64,7 +64,7 @@ class Car(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image, self.rect = load_image('car.png', -1)
+        self.image, self.rect = load_image('car_small.png', -1)
         """Set the number of Pixels to move each time"""
         self.x_dist = 5
         self.y_dist = 5
