@@ -30,7 +30,6 @@ class SimMain:
             self.width, self.height))
 
     def MainLoop(self):
-        """Load All of our Sprites"""
         self.LoadSprites()
 
         """Create the background"""
@@ -71,6 +70,10 @@ class Car(pygame.sprite.Sprite):
         yMove = 0
 
         xMove = self.x_dist
+
+        loc = self.rect.topleft
+        if loc[0] > WIDTH:
+            xMove = -WIDTH
         self.rect.move_ip(xMove, yMove)
 
 
