@@ -44,6 +44,7 @@ class PyManMain:
         self.background.fill((0, 0, 0))
 
         while 1:
+            # speed = vehicle.frameUpdate()
             self.car.move()
 
             """Do the Drawging"""
