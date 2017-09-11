@@ -16,9 +16,6 @@ CAR_EVERY_FRAMES = 60
 
 
 class SimMain:
-    """The Main PyMan Class - This class handles the main
-    initialization and creating of the Game."""
-
     def __init__(self, width=WIDTH, height=HEIGHT):
         """Initialize"""
         """Initialize PyGame"""
