@@ -2,12 +2,12 @@
 
 import pygame
 import time
-from helpers import load_image
+from .helpers import load_image
 
 if not pygame.font:
-    print 'Warning, fonts disabled'
+    print('Warning, fonts disabled')
 if not pygame.mixer:
-    print 'Warning, sound disabled'
+    print('Warning, sound disabled')
 
 WIDTH = 640
 HEIGHT = 480
