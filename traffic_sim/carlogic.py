@@ -1,21 +1,21 @@
 class Vehicle:
 
-  def __init__(self, length, width, vehicleType, speed, turn, lane, maxSpeed, acceleration, id):
-      self.length = length
-      self.width = width
-      self.vehicleType = vehicleType
-      self.speed = speed
-      self.brakeSpeed = brakeSpeed
-      self.turn = turn
-      self.id = id
-      self.lane = lane
-      self.maxSpeed = maxSpeed
-      self.acceleration = acceleration
+ 	def __init__(self, length: int, width: int, vehicleType: str, speed: int, turn: int, lane: str, maxSpeed: int, acceleration: int, id: int):
+    	self.length = length
+    	self.width = width
+	    self.vehicleType = vehicleType
+	    self.speed = speed
+	    self.brakeSpeed = brakeSpeed
+	    self.turn = turn
+	    self.id = id
+	    self.lane = lane
+	    self.maxSpeed = maxSpeed
+	    self.acceleration = acceleration
 
   def frameUpdate(self):
-      if (lane.checkLight):
+      if (not lane.checkLight):
           speed = max(speed - brakeSpeed,0)
-      if(not lane.checkLight):
+      if(lane.checkLight):
           speed = min(speed + acceleration ,maxSpeed)
 
       return(speed)
@@ -23,10 +23,10 @@ class Vehicle:
 
 class TrafficLight:
 
-  def __init__(self,color, strategy, id):
-      self.Green = color
+  def __init__(self,green: bool, strategy: str, id: int):
+      self.green = green
       self.id = id
-      self.strategy =strategy
+      self.strategy = strategy
       self.framerateCount = 0
 
   if (self.strategy = classic):
@@ -38,12 +38,9 @@ class TrafficLight:
       if (changerate=<framerateCount)
           framerateCount = 0
           self.changeLight()
-  def checkLight(self):
-
-
 
   def changeLight(self):
-    self.color = not color
+    self.green = not green
 
 
 

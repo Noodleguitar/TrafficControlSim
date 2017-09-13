@@ -17,7 +17,7 @@ ROAD_SEPARATION_WIDTH = 2
 
 
 class Lane:
-    def __init__(self, direction: Coord, towards: bool, order: int):
+    def __init__(self, direction: Coord, towards: bool, order: int, light):
         """
         Create a lane going towards or from the intersection.
         :param direction: (Coord) Unit vector of direction of lane.
@@ -28,7 +28,10 @@ class Lane:
         self.direction = direction
         self.towards = towards
         self.order = order
+        self.light =light
 
+    def checklight(self):
+        return light
 
 class Intersection:
     def __init__(self, center: Coord):
