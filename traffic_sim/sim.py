@@ -2,7 +2,11 @@
 
 import pygame
 import time
-from .helpers import load_image
+
+from intersection import Intersection
+from carlogic import Vehicle, TrafficLight
+from helpers import load_image
+from sim_utils.utils import Coord
 
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -26,6 +30,27 @@ class SimMain:
         """Create the Screen"""
         self.screen = pygame.display.set_mode((
             self.width, self.height))
+        pygame.display.set_caption('Traffic Control Simulation')
+
+        self.intersection = Intersection(center=Coord(x=WIDTH*0.5, y=HEIGHT*0.5))
+        # Add traffic light
+        traffic_light = TrafficLight(green=True, strategy='classic', id_=0)
+        # Add a few dummy lanes
+        self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=0, light=traffic_light)
+        self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=1)
+        self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=0)
+        self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=1)
+        self.intersection.add_lane(direction=Coord(-1, 0), towards=True, order=0)
+        self.intersection.add_lane(direction=Coord(-1, 0), towards=True, order=1)
+        self.intersection.add_lane(direction=Coord(-1, 0), towards=False, order=0)
+        self.intersection.add_lane(direction=Coord(-1, 0), towards=False, order=1)
+        self.intersection.add_lane(direction=Coord(0, -1), towards=False, order=0)
+        self.intersection.add_lane(direction=Coord(0, -1), towards=True, order=0)
+        self.intersection.add_lane(direction=Coord(0, 1), towards=False, order=0)
+        self.intersection.add_lane(direction=Coord(0, 1), towards=True, order=0)
+
+        # Add car (and link it to the 1st lane which has a traffic light attached)
+        self.vehicle = Vehicle(300, 150, 'car', 80, 3, self.intersection.lanes[0], 160, 2, 3, id_=0)
 
         self.carframecounter = 0
 
@@ -38,16 +63,18 @@ class SimMain:
         self.background.fill((0, 0, 0))
 
         while 1:
-
-            # speed = vehicle.frameUpdate()
-            self.car.move()
+            # Update traffic light and car
+            self.intersection.lanes[0].light.frameUpdate()
+            self.vehicle.frameUpdate()
+            # self.car.move()
             self.maybe_add_car()
             for car in self.cars_sprites:
-                car.move()
+                car.move(self.vehicle.speed)
 
 
             """Do the Drawing"""
             self.screen.blit(self.background, (0, 0))
+            self.intersection.render(self.screen)
 
             self.cars_sprites.draw(self.screen)
             pygame.display.flip()
@@ -73,11 +100,9 @@ class Car(pygame.sprite.Sprite):
         self.x_dist = 5
         self.y_dist = 5
 
-    def move(self):
-        xMove = 0
+    def move(self, speed):
         yMove = 0
-
-        xMove = self.x_dist
+        xMove = speed * 0.05
 
         loc = self.rect.topleft
         if loc[0] > WIDTH:
