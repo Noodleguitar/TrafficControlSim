@@ -37,20 +37,16 @@ class SimMain:
         traffic_light = TrafficLight(green=True, strategy='classic', id_=0)
         # Add a few dummy lanes
         self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=0, light=traffic_light)
-        self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=1)
         self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=0)
-        self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=1)
         self.intersection.add_lane(direction=Coord(-1, 0), towards=True, order=0)
-        self.intersection.add_lane(direction=Coord(-1, 0), towards=True, order=1)
         self.intersection.add_lane(direction=Coord(-1, 0), towards=False, order=0)
-        self.intersection.add_lane(direction=Coord(-1, 0), towards=False, order=1)
         self.intersection.add_lane(direction=Coord(0, -1), towards=False, order=0)
         self.intersection.add_lane(direction=Coord(0, -1), towards=True, order=0)
         self.intersection.add_lane(direction=Coord(0, 1), towards=False, order=0)
         self.intersection.add_lane(direction=Coord(0, 1), towards=True, order=0)
 
         # Add car (and link it to the 1st lane which has a traffic light attached)
-        self.vehicle = Vehicle(300, 150, 'car', 80, 3, self.intersection.lanes[0], 160, 2, 3, id_=0)
+        self.vehicle = Vehicle(300, 150, 'car', 80, 3, self.intersection.lanes[0], 140, 2, 3, id_=0)
 
         self.carframecounter = 0
 
