@@ -7,4 +7,5 @@ http://ieeexplore.ieee.org/document/6232229/
 "Adaptive Traffic Lights Using Car-to-Car Communication", 2007
 http://ieeexplore.ieee.org.proxy-ub.rug.nl/stamp/stamp.jsp?arnumber=4212445
 
+"Self-Control of Traffic Lights and Vehicle Flows in Urban Road Networks", 2008
 https://arxiv.org/pdf/0802.0403.pdf
