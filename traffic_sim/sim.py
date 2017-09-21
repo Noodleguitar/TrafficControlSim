@@ -58,7 +58,8 @@ class SimMain:
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-        while 1:
+        running = True
+        while running:
             # Update traffic light and car
             self.intersection.lanes[0].light.frameUpdate()
             self.vehicle.frameUpdate()
@@ -67,14 +68,28 @@ class SimMain:
             for car in self.cars_sprites:
                 car.move(self.vehicle.speed)
 
-
             """Do the Drawing"""
             self.screen.blit(self.background, (0, 0))
             self.intersection.render(self.screen)
 
             self.cars_sprites.draw(self.screen)
             pygame.display.flip()
+
+            # Handle events
+            running = self.handle_events_()
+
+            # Clamp to maximum frame rate
             time.sleep(1.0 / FRAMERATE)
+
+    def handle_events_(self):
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                # Key press
+                if event.key == pygame.K_ESCAPE:
+                    return False
+        # print(events)
+        return True
 
     def maybe_add_car(self):
         if self.carframecounter == 0:
