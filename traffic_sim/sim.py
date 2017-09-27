@@ -13,8 +13,8 @@ if not pygame.font:
 if not pygame.mixer:
     print('Warning, sound disabled')
 
-WIDTH = 640
-HEIGHT = 480
+WIDTH = 1200
+HEIGHT = 800
 FRAMERATE = 60
 CAR_EVERY_FRAMES = 60
 
@@ -35,18 +35,19 @@ class SimMain:
         self.intersection = Intersection(center=Coord(x=WIDTH*0.5, y=HEIGHT*0.5))
         # Add traffic light
         traffic_light = TrafficLight(green=True, strategy='classic', id_=0)
+        traffic_light2 = TrafficLight(green=False, strategy='classic', id_=1)
         # Add a few dummy lanes
-        self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=0, light=traffic_light)
-        self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=0)
+        self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=0)
+        self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=0, light=traffic_light)
         self.intersection.add_lane(direction=Coord(-1, 0), towards=True, order=0)
         self.intersection.add_lane(direction=Coord(-1, 0), towards=False, order=0)
         self.intersection.add_lane(direction=Coord(0, -1), towards=False, order=0)
-        self.intersection.add_lane(direction=Coord(0, -1), towards=True, order=0)
+        self.intersection.add_lane(direction=Coord(0, -1), towards=True, order=0, light=traffic_light2)
         self.intersection.add_lane(direction=Coord(0, 1), towards=False, order=0)
         self.intersection.add_lane(direction=Coord(0, 1), towards=True, order=0)
 
-        # Add car (and link it to the 1st lane which has a traffic light attached)
-        self.vehicle = Vehicle(300, 150, 'car', 80, 3, self.intersection.lanes[0], 140, 2, 3, id_=0)
+        # Add car (and link it to the 2nd lane which has a traffic light attached)
+        self.vehicle = Vehicle(300, 150, 'car', 80, 3, self.intersection.lanes[1], 140, 2, 3, id_=0)
 
         self.carframecounter = 0
 
@@ -61,7 +62,8 @@ class SimMain:
         running = True
         while running:
             # Update traffic light and car
-            self.intersection.lanes[0].light.frameUpdate()
+            self.intersection.lanes[1].light.frameUpdate()
+            self.intersection.lanes[5].light.frameUpdate()
             self.vehicle.frameUpdate()
             # self.car.move()
             self.maybe_add_car()
