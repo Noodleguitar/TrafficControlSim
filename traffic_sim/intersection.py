@@ -34,23 +34,40 @@ class Intersection:
 
 class TrafficLight:
     def __init__(self, green: bool, strategy: str, id_: int):
-        self.green = green
+        if green:
+            self.state = 'green'
+        else:
+            self.state = 'red'
         self.id = id_
         self.strategy = strategy
         self.framerateCount = 0
         self.changeRate = 100
+        self.yellow_rate = 100
 
-        if (self.strategy == 'classic'):
-            self.changeRate = 180
+        if self.strategy == 'classic':
+            self.changeRate = 210
+            self.yellow_rate = 100
+
+        self.current_rate = self.changeRate
 
     def frameUpdate(self):
         self.framerateCount += 1
-        if (self.changeRate <= self.framerateCount):
+        if self.current_rate <= self.framerateCount:
             self.framerateCount = 0
             self.changeLight()
 
     def changeLight(self):
-        self.green = not self.green
+        if self.state == 'green':
+            self.state = 'yellow'
+            self.current_rate = self.yellow_rate
+            return
+        if self.state == 'yellow':
+            self.state = 'red'
+            self.current_rate = self.changeRate
+            return
+        if self.state == 'red':
+            self.state = 'green'
+            return
 
 
 class Lane:
@@ -72,7 +89,7 @@ class Lane:
                              'intersection')
 
     def checklight(self):
-        return self.light.green
+        return self.light.state
 
 
 def render_light_(surface, lane: Lane, start: Coord, end: Coord):
@@ -86,11 +103,7 @@ def render_light_(surface, lane: Lane, start: Coord, end: Coord):
     line_end = Coord(x=line_start.x - lane.direction.y * LANE_WIDTH,
                      y=line_start.y + lane.direction.x * LANE_WIDTH)
 
-    if lane.checklight():
-        line_colour = LIGHT_COLOURS['green']
-    else:
-        line_colour = LIGHT_COLOURS['red']
-    # print(line_start, line_end)
+    line_colour = LIGHT_COLOURS[lane.checklight()]
     pygame.draw.line(surface, line_colour, (line_start.x, line_start.y), (line_end.x, line_end.y), 2)
 
 

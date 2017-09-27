@@ -17,7 +17,7 @@ class Vehicle:
         self.acceleration = acceleration
 
     def frameUpdate(self):
-        if (not self.lane.checklight()):
+        if self.lane.checklight() == 'yellow' or self.lane.checklight() == 'red':
             self.speed = max(self.speed - self.brakeSpeed, 0)
         else:
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
