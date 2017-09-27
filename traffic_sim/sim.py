@@ -3,8 +3,8 @@
 import pygame
 import time
 
-from intersection import Intersection
-from carlogic import Vehicle, TrafficLight
+from intersection import Intersection, TrafficLight
+from carlogic import Vehicle
 from helpers import load_image
 from sim_utils.utils import Coord
 

@@ -11,6 +11,48 @@ LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'green':   (0, 255, 255)}
 
 
+class Intersection:
+    def __init__(self, center: Coord):
+        self.center = center
+        self.lanes = list()
+        # self.signals = list()
+
+    def add_lane(self, direction, towards, order, light=None):
+        self.lanes.append(Lane(direction, towards, order, light=light))
+
+    def render(self, surface):
+        for lane in self.lanes:
+            # Draw first line (closest to center)
+            start, end = get_lane_points_(lane, self.center)
+            pygame.draw.line(surface, (255, 255, 255), (start.x, start.y), (end.x, end.y))
+            # Draw second line
+            start_off, end_off = get_lane_points_(lane, self.center, order_offset=1)
+            pygame.draw.line(surface, (255, 255, 255), (start_off.x, start_off.y), (end_off.x, end_off.y))
+            # Render the traffic light on this lane if applicable
+            render_light_(surface, lane, start, end)
+
+
+class TrafficLight:
+    def __init__(self, green: bool, strategy: str, id_: int):
+        self.green = green
+        self.id = id_
+        self.strategy = strategy
+        self.framerateCount = 0
+        self.changeRate = 100
+
+        if (self.strategy == 'classic'):
+            self.changeRate = 180
+
+    def frameUpdate(self):
+        self.framerateCount += 1
+        if (self.changeRate <= self.framerateCount):
+            self.framerateCount = 0
+            self.changeLight()
+
+    def changeLight(self):
+        self.green = not self.green
+
+
 class Lane:
     def __init__(self, direction: Coord, towards: bool, order: int, light=None):
         """
@@ -31,27 +73,6 @@ class Lane:
 
     def checklight(self):
         return self.light.green
-
-
-class Intersection:
-    def __init__(self, center: Coord):
-        self.center = center
-        self.lanes = list()
-        # self.signals = list()
-
-    def add_lane(self, direction, towards, order, light=None):
-        self.lanes.append(Lane(direction, towards, order, light=light))
-
-    def render(self, surface):
-        for lane in self.lanes:
-            # Draw first line (closest to center)
-            start, end = get_lane_points_(lane, self.center)
-            pygame.draw.line(surface, (255, 255, 255), (start.x, start.y), (end.x, end.y))
-            # Draw second line
-            start_off, end_off = get_lane_points_(lane, self.center, order_offset=1)
-            pygame.draw.line(surface, (255, 255, 255), (start_off.x, start_off.y), (end_off.x, end_off.y))
-            # Render the traffic light on this lane if applicable
-            render_light_(surface, lane, start, end)
 
 
 def render_light_(surface, lane: Lane, start: Coord, end: Coord):
