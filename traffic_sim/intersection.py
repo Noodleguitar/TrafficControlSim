@@ -4,8 +4,11 @@ from sim_utils.utils import Coord
 
 
 LANE_WIDTH = 35
-LANE_LENGTH = 500
-ROAD_SEPARATION_WIDTH = 1
+LANE_LENGTH = 1000
+ROAD_SEPARATION_WIDTH = 2
+LIGHT_COLOURS = {'red':     (255, 0, 0),
+                 'yellow':  (255, 255, 0),
+                 'green':   (0, 255, 255)}
 
 
 class Lane:
@@ -22,6 +25,10 @@ class Lane:
         self.order = order
         self.light = light
 
+        if (light is not None) and (not towards):
+            raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
+                             'intersection')
+
     def checklight(self):
         return self.light.green
 
@@ -37,13 +44,36 @@ class Intersection:
 
     def render(self, surface):
         for lane in self.lanes:
-            start, end = get_lane_points(lane, self.center)
+            # Draw first line (closest to center)
+            start, end = get_lane_points_(lane, self.center)
             pygame.draw.line(surface, (255, 255, 255), (start.x, start.y), (end.x, end.y))
-            start, end = get_lane_points(lane, self.center, order_offset=1)
-            pygame.draw.line(surface, (255, 255, 255), (start.x, start.y), (end.x, end.y))
+            # Draw second line
+            start_off, end_off = get_lane_points_(lane, self.center, order_offset=1)
+            pygame.draw.line(surface, (255, 255, 255), (start_off.x, start_off.y), (end_off.x, end_off.y))
+            # Render the traffic light on this lane if applicable
+            render_light_(surface, lane, start, end)
 
 
-def get_lane_points(lane: Lane, center: Coord, order_offset=0):
+def render_light_(surface, lane: Lane, start: Coord, end: Coord):
+    if lane.light is None:
+        # No light to render
+        return
+
+    line_start = Coord(x=start.x + (end.x - start.x) * 0.95,
+                       y=start.y + (end.y - start.y) * 0.95)
+    # Traffic light line should be normal to the lane direction
+    line_end = Coord(x=line_start.x - lane.direction.y * LANE_WIDTH,
+                     y=line_start.y + lane.direction.x * LANE_WIDTH)
+
+    if lane.checklight():
+        line_colour = LIGHT_COLOURS['green']
+    else:
+        line_colour = LIGHT_COLOURS['red']
+    # print(line_start, line_end)
+    pygame.draw.line(surface, line_colour, (line_start.x, line_start.y), (line_end.x, line_end.y), 2)
+
+
+def get_lane_points_(lane: Lane, center: Coord, order_offset=0):
     if abs(lane.direction.x) > 0:
         # Horizontal lane
         if lane.direction.x > 0:
@@ -85,7 +115,6 @@ def get_lane_points(lane: Lane, center: Coord, order_offset=0):
                 start = Coord(x=start_x,
                               y=center.y)
 
-    # placeholder
     end = Coord(start.x + lane.direction.x * LANE_LENGTH,
                 start.y + lane.direction.y * LANE_LENGTH)
 
