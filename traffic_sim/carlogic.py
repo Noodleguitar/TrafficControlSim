@@ -1,4 +1,3 @@
-from intersection import Lane
 import pygame
 from sim_utils.utils import load_image
 from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
@@ -6,8 +5,8 @@ from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
 
 class Vehicle(pygame.sprite.Sprite):
 
-    def __init__(self, length: int, width: int, vehicleType: str, speed: int, turn: int, lane: Lane, maxSpeed: int,
-                 acceleration: int, brakeSpeed: int, id_: int, turnPoint: int, start, direction, finish):
+    def __init__(self, length: int, width: int, str, speed: int, maxSpeed: int,
+                 acceleration: int, turnPoint: int, start, direction, finish):
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
             self.image, self.rect = load_image('car_small_right.png', -1)
@@ -22,12 +21,7 @@ class Vehicle(pygame.sprite.Sprite):
         self.length = length
         self.width = width
         self.rect = pygame.Rect(self.start[0], self.start[1], self.length, self.width)
-        self.vehicleType = vehicleType
         self.speed = speed
-        self.brakeSpeed = brakeSpeed
-        self.turn = turn
-        self.id = id_
-        self.lane = lane
         self.maxSpeed = maxSpeed
         self.acceleration = acceleration
         self.turnPoint = turnPoint
@@ -35,21 +29,19 @@ class Vehicle(pygame.sprite.Sprite):
         self.hasTurned = False
         self.inQ = False
 
-    def frameUpdate(self):
-        if self.lane.checklight() == 'green':
+    def frameUpdate(self, light, qlength):
+        if light == 'green':
             self.lane.emptyQ()
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
         elif self.isPassedLight():
+            self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
-        elif self.beforeQ():
+        elif self.beforeQ(qlength):
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
         else:
-            if not self.inQ:
-                self.lane.addToQ(self.length)
             self.inQ = True
-            self.speed = max(self.speed - self.brakeSpeed, 0)
-
+            self.speed = 0
         self.move()
 
     def move(self):
@@ -94,10 +86,14 @@ class Vehicle(pygame.sprite.Sprite):
                 return True
         return False
 
-    def beforeQ(self):
+    def beforeQ(self, qlength):
         loc = self.rect.topleft
-        if self.direction == 'E' and (loc[0] < (self.turnPoint - self.lane.getQ())):
+        if self.direction == 'E' and (loc[0] < (self.turnPoint - qlength)):
             return True
-        if self.direction == 'W' and (loc[0] > (self.turnPoint + self.lane.getQ())):
+        if self.direction == 'W' and (loc[0] > (self.turnPoint + qlength)):
+            return True
+        if self.direction == 'N' and (loc[1] > (self.turnPoint + qlength)):
+            return True
+        if self.direction == 'S' and (loc[1] < (self.turnPoint - qlength)):
             return True
         return False

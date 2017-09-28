@@ -1,5 +1,6 @@
 import pygame
 from sim_utils.utils import Coord
+from carlogic import Vehicle
 
 
 LANE_WIDTH = 35
@@ -16,8 +17,8 @@ class Intersection:
         self.lanes = list()
         # self.signals = list()
 
-    def add_lane(self, direction, towards, order, startQ, light=None):
-        self.lanes.append(Lane(direction, towards, order, startQ, light=light))
+    def add_lane(self, direction, towards, order, light=None):
+        self.lanes.append(Lane(direction, towards, order, light=light))
 
     def render(self, surface):
         for lane in self.lanes:
@@ -40,37 +41,26 @@ class TrafficLight:
         self.id = id_
         self.strategy = strategy
         self.framerateCount = 0
-        self.changeRate = 100
-        self.yellow_rate = 100
-
-        if self.strategy == 'classic':
-            self.changeRate = 210
-            self.yellow_rate = 100
-
-        self.current_rate = self.changeRate
+        self.framesInRotation = 1200
+        self.greentime = self.framesInRotation / 6
 
     def frameUpdate(self):
         self.framerateCount += 1
-        if self.current_rate <= self.framerateCount:
+        if self.strategy == 'classic':
+            green = self.id * self.framesInRotation / 4
+            yellow = green + self.greentime
+            red = (self.id + 1) * self.framesInRotation / 4
+            if self.framerateCount == green:
+                self.state = 'green'
+            if self.framerateCount == yellow:
+                self.state = 'yellow'
+            if self.framerateCount == red:
+                self.state = 'red'
+        if self.framesInRotation == self.framerateCount:
             self.framerateCount = 0
-            self.changeLight()
-
-    def changeLight(self):
-        if self.state == 'green':
-            self.state = 'yellow'
-            self.current_rate = self.yellow_rate
-            return
-        if self.state == 'yellow':
-            self.state = 'red'
-            self.current_rate = self.changeRate
-            return
-        if self.state == 'red':
-            self.state = 'green'
-            return
-
 
 class Lane:
-    def __init__(self, direction: Coord, towards: bool, order: int, startQ: int, light=None):
+    def __init__(self, direction: Coord, towards: bool, order: int, light=None):
         """
         Create a lane going towards or from the intersection.
         :param direction: (Coord) Unit vector of direction of lane.
@@ -82,24 +72,26 @@ class Lane:
         self.towards = towards
         self.order = order
         self.light = light
-        self.startQ = startQ
-        self.emptyQ()
+        self.cars_sprites = pygame.sprite.Group()
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
                              'intersection')
 
+    def addCar(self, v: Vehicle):
+        self.cars_sprites.add(v)
+
+    def updateCars(self, screen):
+        qlength = 50
+        for car in self.cars_sprites:
+            if car.inQ:
+                qlength += car.length + 5
+        for car in self.cars_sprites:
+            car.frameUpdate(self.checklight(), qlength)
+        self.cars_sprites.draw(screen)
+
     def checklight(self):
         return self.light.state
-
-    def emptyQ(self):
-        self.q = self.startQ
-
-    def addToQ(self, length):
-        self.q += length
-
-    def getQ(self):
-        return self.q
 
 
 def render_light_(surface, lane: Lane, start: Coord, end: Coord):
