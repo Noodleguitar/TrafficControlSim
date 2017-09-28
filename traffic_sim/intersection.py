@@ -1,5 +1,4 @@
 import pygame
-
 from sim_utils.utils import Coord
 
 
@@ -17,8 +16,8 @@ class Intersection:
         self.lanes = list()
         # self.signals = list()
 
-    def add_lane(self, direction, towards, order, light=None):
-        self.lanes.append(Lane(direction, towards, order, light=light))
+    def add_lane(self, direction, towards, order, startQ, light=None):
+        self.lanes.append(Lane(direction, towards, order, startQ, light=light))
 
     def render(self, surface):
         for lane in self.lanes:
@@ -71,7 +70,7 @@ class TrafficLight:
 
 
 class Lane:
-    def __init__(self, direction: Coord, towards: bool, order: int, light=None):
+    def __init__(self, direction: Coord, towards: bool, order: int, startQ: int, light=None):
         """
         Create a lane going towards or from the intersection.
         :param direction: (Coord) Unit vector of direction of lane.
@@ -83,6 +82,8 @@ class Lane:
         self.towards = towards
         self.order = order
         self.light = light
+        self.startQ = startQ
+        self.emptyQ()
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
@@ -90,6 +91,15 @@ class Lane:
 
     def checklight(self):
         return self.light.state
+
+    def emptyQ(self):
+        self.q = self.startQ
+
+    def addToQ(self, length):
+        self.q += length
+
+    def getQ(self):
+        return self.q
 
 
 def render_light_(surface, lane: Lane, start: Coord, end: Coord):
