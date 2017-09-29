@@ -16,13 +16,14 @@ class Controller:
         # Sort lanes with traffic lights by queue time, descending
         self.light_lanes = sorted(self.light_lanes, key=operator.attrgetter('queue_length'), reverse=True)
 
-        for l in self.light_lanes:
+        for i, l in enumerate(self.light_lanes):
             if l.checklight() == 'yellow':
                 # Yellow light on one of the lanes, no action taken
                 return
             if l.checklight() == 'green':
-                if l.light.get_current_light_time() > MIN_GREEN_TIME:
-                    # Minimum green time expired, light can be switched
+                if i > 0 and l.light.get_current_light_time() > MIN_GREEN_TIME:
+                    # Lane is not the highest priority at this moment and minimum green time expired,
+                    # light can be switched to yellow.
                     l.light.set_state('yellow')
                 return
 
