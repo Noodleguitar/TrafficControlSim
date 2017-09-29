@@ -2,7 +2,7 @@
 #### Authors:
 * Elbert Fliek (s1917188)
 * Albert Thie (s1652184)
-* Noël Lüneburg (s177315)
+* Noël Lüneburg (s1773135)
 
 ### The main problem to be addressed
 Traffic control system on individual, or multiple intersections do not use signals from individual cars in a meaningful way, except for road sensors often placed in the proximity of traffic lights. There are proposed systems that do try to use these signals, in light of automation technology. The first of the systems that has gone from simulations to actual implentation in a real world situation is one that is based on the paper "Self-Control of Traffic Lights and Vehicle Flows in Urban Road Networks" by Lämmer et al. (http://stefanlaemmer.de/)
