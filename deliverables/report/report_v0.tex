@@ -1,0 +1,83 @@
+\documentclass{article}
+\usepackage{bnaic}
+
+
+%% if your are not using LaTeX2e use instead
+%% \documentstyle[bnaic]{article}
+
+%% begin document with title, author and affiliations
+
+\title{\textbf{\huge Traffic Control Simulation - Report v.0}}
+\author{Elbert Fliek (s1917188) \affila \and
+    Albert Thie (s1652184) \affila \and
+    No\"el L\"uneburg (s1773135) \affila}
+\date{\affila\ \textit{University of Groningen}}
+
+\pagestyle{empty}
+
+\begin{document}
+\ttl
+\thispagestyle{empty}
+
+
+%\begin{abstract}
+%\noindent
+%\end{abstract}
+
+
+\section{Introduction}
+TODO. 
+
+Example citation: \cite{survey2014}
+
+\section{Method}
+TODO. %description of dynamic queue method and communication between traffic lights.
+
+The dynamic queue described above is compared to regular traffic control systems in a simulation environment. Although a simulation is often a simplified version of reality, it allows freedom to create a variety of traffic situations and imposes no restrictions on intersection configurations.
+
+\subsection{Simulation environment}
+% TODO Screenshot(s) of simulation
+We have developed an environment that allows simulation of traffic on intersections. Traffic light status and vehicle activity is visualized from a top-down view.
+
+A simulated traffic scenario contains an intersection with lanes going towards and away from it. A variety of vehicles occupy these lanes. This section describes properties that can be adjusted for each entity.
+
+\paragraph{Intersection} ~\\
+An intersection within our simulation can connect roads in up to four directions; north, south, east and west. \\
+\textbf{Number of lanes} ~ The number of lanes in each direction is used to modify traffic capacity and affect the complexity of the traffic situation.\\
+\textbf{Traffic lights} ~ Traffic lights can be placed on lanes entering the intersection, signalling whether or not approaching vehicles can proceed.
+
+\paragraph{Vehicle} ~\\
+Each vehicle is tied to a lane heading toward or away from an intersection. Vehicles are individual agents with the following properties:\\
+\textbf{Length} ~ Length of the vehicle.\\
+\textbf{Turning rate} ~ Duration for this vehicle to fully turn either right or left on an intersection.\\
+\textbf{Deceleration} ~ Braking constant, determines the rate at which the speed diminishes when a vehicle is slowing down.\\
+\textbf{Acceleration} ~ Acceleration constant, determines the rate at which the speed increases when a vehicle accelerates.\\
+\textbf{Maximum speed} ~ Maximum speed of the vehicle.\\
+
+\subsection{Experimental setup}
+\label{exp_setup}
+Two traffic control systems are compared. The first is a regular system which operates based on inputs from road sensors in front of traffic lights. Each vehicle that passes one of these sensors generates a pulse. The total number of pulses determines the priority of the lane going into the intersection. The lane with the highest current priority will show a green signal, but only after every other lane has shown a red signal. This entails that only one lane can be active at one time. To avoid rapid light changes, a minimum green signal duration is enforced.
+
+The second system is similar in that it operates using a lane priority system. However, more information is available, such as the type of each vehicle, and traffic density in a particular direction. Each traffic signal has access to traffic information of the lane that it is assigned to. Communication between traffic signals of different lanes determines which lane is allowed access to the intersection at any point in time.
+
+To quantify the performance of both systems we make use of two measures: the average waiting time of all vehicles, and the average time it takes for each vehicle to completely follow its path from entering the simulated world until exiting.
+
+\section{Results}
+
+\section{Conclusion}
+
+
+\bibliographystyle{plain}
+\bibliography{literature}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
