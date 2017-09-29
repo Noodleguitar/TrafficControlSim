@@ -31,7 +31,6 @@ class Vehicle(pygame.sprite.Sprite):
 
     def frameUpdate(self, light, qlength):
         if light == 'green':
-            self.lane.emptyQ()
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
         elif self.isPassedLight():

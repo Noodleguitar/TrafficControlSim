@@ -17,6 +17,9 @@ class Intersection:
         self.lanes = list()
         # self.signals = list()
 
+    def get_lanes(self):
+        return self.lanes
+
     def add_lane(self, direction, towards, order, light=None):
         self.lanes.append(Lane(direction, towards, order, light=light))
 
@@ -43,21 +46,21 @@ class TrafficLight:
         self.framerateCount = 0
         self.framesInRotation = 1200
         self.greentime = self.framesInRotation / 6
+        self.yellow_time = 130
+
+    def get_current_light_time(self):
+        return self.framerateCount
+
+    def set_state(self, state):
+        self.state = state
+        self.framerateCount = 0
 
     def frameUpdate(self):
         self.framerateCount += 1
-        if self.strategy == 'classic':
-            green = self.id * self.framesInRotation / 4
-            yellow = green + self.greentime
-            red = (self.id + 1) * self.framesInRotation / 4
-            if self.framerateCount == green:
-                self.state = 'green'
-            if self.framerateCount == yellow:
-                self.state = 'yellow'
-            if self.framerateCount == red:
-                self.state = 'red'
-        if self.framesInRotation == self.framerateCount:
-            self.framerateCount = 0
+        if self.state == 'yellow' and self.framerateCount >= self.yellow_time:
+            # Change to red
+            self.set_state('red')
+
 
 class Lane:
     def __init__(self, direction: Coord, towards: bool, order: int, light=None):
@@ -73,6 +76,7 @@ class Lane:
         self.order = order
         self.light = light
         self.cars_sprites = pygame.sprite.Group()
+        self.queue_length = 0
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
@@ -82,12 +86,17 @@ class Lane:
         self.cars_sprites.add(v)
 
     def updateCars(self, screen):
+        # Clear queue if light is green
+        if self.checklight() == 'green':
+            self.queue_length = 0
+
         qlength = 50
         for car in self.cars_sprites:
             if car.inQ:
                 qlength += car.length + 5
         for car in self.cars_sprites:
             car.frameUpdate(self.checklight(), qlength)
+        self.queue_length = qlength
         self.cars_sprites.draw(screen)
 
     def checklight(self):

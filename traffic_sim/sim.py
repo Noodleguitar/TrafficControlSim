@@ -5,6 +5,7 @@ import random
 import time
 
 from intersection import Intersection, TrafficLight
+from traffic_controller import Controller
 from carlogic import Vehicle
 from sim_utils.utils import Coord
 from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
@@ -39,6 +40,8 @@ class SimMain:
         self.intersection.add_lane(direction=Coord(0, 1), towards=False, order=0)
         self.intersection.add_lane(direction=Coord(0, 1), towards=True, order=0, light=traffic_lightNS)
 
+        self.controller = Controller(self.intersection.get_lanes())
+
         self.carframecounter = 0
 
     def MainLoop(self):
@@ -51,6 +54,7 @@ class SimMain:
         while running:
             """Do the Drawing"""
             self.screen.blit(self.background, (0, 0))
+
             # Update traffic light and car
             self.intersection.lanes[1].light.frameUpdate()
             self.intersection.lanes[1].updateCars(self.screen)
@@ -61,6 +65,8 @@ class SimMain:
             self.intersection.lanes[7].light.frameUpdate()
             self.intersection.lanes[7].updateCars(self.screen)
             self.maybe_add_car()
+
+            self.controller.update()
 
             self.intersection.render(self.screen)
 

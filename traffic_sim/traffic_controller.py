@@ -1,6 +1,8 @@
 import operator
 
-# TODO: find out which traffic lights conflict with each other
+from config import MIN_GREEN_TIME
+
+# TODO: find out which traffic lights conflict with each other to potentially allow double green lights
 
 
 class Controller:
@@ -11,8 +13,21 @@ class Controller:
         self.light_lanes = self.gather_light_lanes(lanes)
 
     def update(self):
-        # TODO: sort lanes by queue length, find lane that has green, check green time; switch if possible (if yellow).
-        pass
+        # Sort lanes with traffic lights by queue time, descending
+        self.light_lanes = sorted(self.light_lanes, key=operator.attrgetter('queue_length'), reverse=True)
+
+        for l in self.light_lanes:
+            if l.checklight() == 'yellow':
+                # Yellow light on one of the lanes, no action taken
+                return
+            if l.checklight() == 'green':
+                if l.light.get_current_light_time() > MIN_GREEN_TIME:
+                    # Minimum green time expired, light can be switched
+                    l.light.set_state('yellow')
+                return
+
+        # All lights are red, set longest queue to green
+        self.light_lanes[0].light.set_state('green')
 
     @staticmethod
     def gather_light_lanes(lanes):
