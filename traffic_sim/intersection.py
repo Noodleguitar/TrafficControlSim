@@ -94,8 +94,12 @@ class Lane:
         for car in self.cars_sprites:
             if car.inQ:
                 qlength += car.length + 5
-        for car in self.cars_sprites:
-            car.frameUpdate(self.checklight(), qlength)
+        for caridx in range(len(self.cars_sprites)):
+            if caridx == 0:
+                car.frameUpdate(self.checklight(), qlength, None)
+            else:
+                prevCar = self.cars_sprites.sprites()[caridx - 1]
+                car.frameUpdate(self.checklight(), qlength, prevCar)
         self.queue_length = qlength
         self.cars_sprites.draw(screen)
 
