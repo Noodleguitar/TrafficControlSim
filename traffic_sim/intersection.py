@@ -8,7 +8,7 @@ LANE_LENGTH = 1000
 ROAD_SEPARATION_WIDTH = 2
 LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'yellow':  (255, 255, 0),
-                 'green':   (0, 255, 255)}
+                 'green':   (0, 255, 0)}
 
 
 class Intersection:
