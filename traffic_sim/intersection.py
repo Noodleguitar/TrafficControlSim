@@ -94,6 +94,13 @@ class Lane:
         for car in self.cars_sprites:
             if car.inQ:
                 qlength += car.length + 5
+                
+       #  for car in self.cars_sprites:
+       #  if not car.inQ and car.isPassedLight:
+       #  time = (car.location - queue_length)/car.maxspeed
+       #  if(time <=( (delay * nrCarsInQ) + acctime )):
+       #        qlength += car.length + 5
+       #        nrCarsInQ += 1
         prevCar = None
         for car in self.cars_sprites:
             car.frameUpdate(self.checklight(), qlength, prevCar)
