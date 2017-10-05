@@ -24,7 +24,7 @@ class SimMain:
             self.width, self.height))
         pygame.display.set_caption('Traffic Control Simulation')
 
-        self.intersection = Intersection(center=Coord(x=WIDTH*0.5, y=HEIGHT * 0.5))
+        self.intersection = Intersection(center=Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5))
         # Add traffic light
         traffic_lightWE = TrafficLight(green=True, strategy='classic', id_=0)
         traffic_lightEW = TrafficLight(green=False, strategy='classic', id_=1)
@@ -92,22 +92,22 @@ class SimMain:
             if rand == 0:
                 self.intersection.lanes[1].addCar(
                     Vehicle(64, 32, 'car', 80,
-                    140, 2, WIDTH / 2 - 67, (0, HEIGHT / 2), 'E', WIDTH)
+                            140, 2, WIDTH / 2 - 67, (0, HEIGHT / 2), 'E', WIDTH)
                 )
             if rand == 1:
                 self.intersection.lanes[2].addCar(
                     Vehicle(64, 32, 'car', 80,
-                    140, 2, WIDTH / 2 + 8, (WIDTH, HEIGHT / 2 - 37), 'W', 0)
+                            140, 2, WIDTH / 2 + 8, (WIDTH, HEIGHT / 2 - 37), 'W', 0)
                 )
             if rand == 2:
                 self.intersection.lanes[7].addCar(
                     Vehicle(64, 32, 'car', 80,
-                    140, 2, HEIGHT / 2 - 70, (WIDTH / 2 - 37, 0), 'S', 0)
+                            140, 2, HEIGHT / 2 - 70, (WIDTH / 2 - 37, 0), 'S', 0)
                 )
             if rand == 3:
                 self.intersection.lanes[5].addCar(
                     Vehicle(64, 32, 'car', 80,
-                    140, 2, HEIGHT / 2 + 10, (WIDTH / 2, HEIGHT), 'N', HEIGHT)
+                            140, 2, HEIGHT / 2 + 10, (WIDTH / 2, HEIGHT), 'N', HEIGHT)
                 )
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:

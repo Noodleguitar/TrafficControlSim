@@ -5,7 +5,7 @@ from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
 
 class Vehicle(pygame.sprite.Sprite):
 
-    def __init__(self, length: int, width: int, str, speed: int, maxSpeed: int,
+    def __init__(self, length: int, width: int, name: str, speed: int, maxSpeed: int,
                  acceleration: int, turnPoint: int, start, direction, finish):
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
