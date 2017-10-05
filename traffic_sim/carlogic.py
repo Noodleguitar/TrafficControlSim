@@ -1,7 +1,7 @@
 import pygame
 from sim_utils.utils import load_image
 from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
-
+import logging
 
 class Vehicle(pygame.sprite.Sprite):
 
@@ -47,21 +47,25 @@ class Vehicle(pygame.sprite.Sprite):
         loc = self.rect.topleft
         if self.direction == 'E':
             if loc[0] > self.finish:
+                logging.eastCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * 0.05, 0)
         if self.direction == 'W':
             if loc[0] < self.finish:
+                logging.westCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * -0.05, 0)
         if self.direction == 'N':
             if loc[1] > self.finish:
+                logging.northCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(0, -self.speed * 0.05)
         if self.direction == 'S':
             if loc[1] < self.finish:
+                logging.southCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(0, self.speed * 0.05)
