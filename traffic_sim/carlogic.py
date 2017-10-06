@@ -1,6 +1,7 @@
 import pygame
-from sim_utils.utils import load_image
-from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
+
+from sim_utils.config import WIDTH, HEIGHT, LANE_LIGHT_LOCATION, LANE_LENGTH
+from sim_utils.utils import load_image, get_screen_center, get_lane_points
 
 
 class Vehicle(pygame.sprite.Sprite):
@@ -16,18 +17,56 @@ class Vehicle(pygame.sprite.Sprite):
             self.image, self.rect = load_image('car_small_up.png', -1)
         if direction == 'S':
             self.image, self.rect = load_image('car_small_down.png', -1)
-        self.start = start
-        self.finish = finish
+
+        # Initially start the car at the start of the lane
+        self.position = 0.0
+
+        self.name = name
+        # self.start = start
+        # self.finish = finish
         self.length = length
         self.width = width
-        self.rect = pygame.Rect(self.start[0], self.start[1], self.length, self.width)
+        # self.rect = pygame.Rect(self.start[0], self.start[1], self.length, self.width)
+        self.rect = pygame.Rect(0, 0, self.length, self.width)
         self.speed = speed
         self.maxSpeed = maxSpeed
         self.acceleration = acceleration
-        self.turnPoint = turnPoint
+        # self.turnPoint = turnPoint
         self.direction = direction
-        self.hasTurned = False
+        # self.hasTurned = False
         self.inQ = False
+
+    def update(self, lane, queue_length):
+        # TODO: prevent crashes by predicting stopping distance
+        if lane.light.checklight() == 'green':
+            self.inQ = False
+            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+        elif self.passed_light():
+            self.inQ = False
+            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+        elif self.beforeQ(queue_length):
+            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+        else:
+            self.inQ = True
+            self.speed = 0
+
+        self.position += self.speed
+
+    def render(self, screen, lane):
+        start, end = get_lane_points(lane, get_screen_center())
+
+        if self.direction == 'E':
+            self.rect.center = (start.x + self.position * LANE_LENGTH,
+                                start.y)
+        if self.direction == 'W':
+            self.rect.center = (start.x - self.position * LANE_LENGTH,
+                                start.y)
+        if self.direction == 'N':
+            self.rect.center = (start.x,
+                                start.y - self.position * LANE_LENGTH)
+        if self.direction == 'S':
+            self.rect.center = (start.x,
+                                start.y + self.position * LANE_LENGTH)
 
     def frameUpdate(self, light, qlength):
         if light == 'green':
@@ -65,6 +104,9 @@ class Vehicle(pygame.sprite.Sprite):
                 self.kill()
             else:
                 self.rect.move_ip(0, self.speed * 0.05)
+
+    def passed_light(self):
+        return self.position > LANE_LIGHT_LOCATION
 
     def isPassedLight(self):
         loc = self.rect.topleft

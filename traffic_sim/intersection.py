@@ -1,14 +1,8 @@
 import pygame
-from sim_utils.utils import Coord
+
 from carlogic import Vehicle
-
-
-LANE_WIDTH = 35
-LANE_LENGTH = 1000
-ROAD_SEPARATION_WIDTH = 2
-LIGHT_COLOURS = {'red':     (255, 0, 0),
-                 'yellow':  (255, 255, 0),
-                 'green':   (0, 255, 0)}
+from sim_utils.config import LANE_LIGHT_LOCATION, LIGHT_COLOURS, LANE_WIDTH
+from sim_utils.utils import Coord, get_lane_points
 
 
 class Intersection:
@@ -23,13 +17,17 @@ class Intersection:
     def add_lane(self, direction, towards, order, light=None):
         self.lanes.append(Lane(direction, towards, order, light=light))
 
+    def update_lanes(self, screen):
+        for lane in self.lanes:
+            lane.update_lane(screen)
+
     def render(self, surface):
         for lane in self.lanes:
             # Draw first line (closest to center)
-            start, end = get_lane_points_(lane, self.center)
+            start, end = get_lane_points(lane, self.center)
             pygame.draw.line(surface, (255, 255, 255), (start.x, start.y), (end.x, end.y))
             # Draw second line
-            start_off, end_off = get_lane_points_(lane, self.center, order_offset=1)
+            start_off, end_off = get_lane_points(lane, self.center, order_offset=1)
             pygame.draw.line(surface, (255, 255, 255), (start_off.x, start_off.y), (end_off.x, end_off.y))
             # Render the traffic light on this lane if applicable
             render_light_(surface, lane, start, end)
@@ -75,7 +73,7 @@ class Lane:
         self.towards = towards
         self.order = order
         self.light = light
-        self.cars_sprites = pygame.sprite.Group()
+        self.cars = pygame.sprite.Group()
         self.queue_length = 0
 
         if (light is not None) and (not towards):
@@ -83,21 +81,25 @@ class Lane:
                              'intersection')
 
     def addCar(self, v: Vehicle):
-        self.cars_sprites.add(v)
+        self.cars.add(v)
 
-    def updateCars(self, screen):
+    def update_lane(self, screen):
         # Clear queue if light is green
         if self.checklight() == 'green':
-            self.queue_length = 0
+            self.queue_length = 50
 
-        qlength = 50
-        for car in self.cars_sprites:
+        self.update_cars(screen)
+
+    def update_cars(self, screen):
+        for car in self.cars:
+            # Apply motion of the car
+            car.update()
+            car.render(screen)
+
             if car.inQ:
-                qlength += car.length + 5
-        for car in self.cars_sprites:
-            car.frameUpdate(self.checklight(), qlength)
-        self.queue_length = qlength
-        self.cars_sprites.draw(screen)
+                self.queue_length += 5
+            # TODO: move drawing somewhere else?
+            self.cars.draw(screen)
 
     def checklight(self):
         return self.light.state
@@ -108,59 +110,11 @@ def render_light_(surface, lane: Lane, start: Coord, end: Coord):
         # No light to render
         return
 
-    line_start = Coord(x=start.x + (end.x - start.x) * 0.95,
-                       y=start.y + (end.y - start.y) * 0.95)
+    line_start = Coord(x=start.x + (end.x - start.x) * LANE_LIGHT_LOCATION,
+                       y=start.y + (end.y - start.y) * LANE_LIGHT_LOCATION)
     # Traffic light line should be normal to the lane direction
     line_end = Coord(x=line_start.x - lane.direction.y * LANE_WIDTH,
                      y=line_start.y + lane.direction.x * LANE_WIDTH)
 
     line_colour = LIGHT_COLOURS[lane.checklight()]
     pygame.draw.line(surface, line_colour, (line_start.x, line_start.y), (line_end.x, line_end.y), 2)
-
-
-def get_lane_points_(lane: Lane, center: Coord, order_offset=0):
-    if abs(lane.direction.x) > 0:
-        # Horizontal lane
-        if lane.direction.x > 0:
-            # East direction
-            start_y = center.y + ROAD_SEPARATION_WIDTH + (lane.order + order_offset) * LANE_WIDTH
-            if lane.towards:
-                start = Coord(x=center.x - LANE_LENGTH,
-                              y=start_y)
-            else:
-                start = Coord(x=center.x,
-                              y=start_y)
-        else:
-            # West direction
-            start_y = center.y - ROAD_SEPARATION_WIDTH - (lane.order + order_offset) * LANE_WIDTH
-            if lane.towards:
-                start = Coord(x=center.x + LANE_LENGTH,
-                              y=start_y)
-            else:
-                start = Coord(x=center.x,
-                              y=start_y)
-    else:
-        # Vertical lane
-        if lane.direction.y > 0:
-            # South direction
-            start_x = center.x - ROAD_SEPARATION_WIDTH - (lane.order + order_offset) * LANE_WIDTH
-            if lane.towards:
-                start = Coord(x=start_x,
-                              y=center.y - LANE_LENGTH)
-            else:
-                start = Coord(x=start_x,
-                              y=center.y)
-        else:
-            # North direction
-            start_x = center.x + ROAD_SEPARATION_WIDTH + (lane.order + order_offset) * LANE_WIDTH
-            if lane.towards:
-                start = Coord(x=start_x,
-                              y=center.y + LANE_LENGTH)
-            else:
-                start = Coord(x=start_x,
-                              y=center.y)
-
-    end = Coord(start.x + lane.direction.x * LANE_LENGTH,
-                start.y + lane.direction.y * LANE_LENGTH)
-
-    return start, end

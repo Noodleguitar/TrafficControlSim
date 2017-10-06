@@ -1,6 +1,6 @@
 import operator
 
-from config import MIN_GREEN_TIME
+from sim_utils.config import MIN_GREEN_TIME
 
 # TODO: find out which traffic lights conflict with each other to potentially allow double green lights
 

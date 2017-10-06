@@ -1,14 +1,15 @@
 #! /usr/bin/env python
 
-import pygame
-import random
 import time
 
-from intersection import Intersection, TrafficLight
-from traffic_controller import Controller
+import pygame
+import random
+
 from carlogic import Vehicle
+from intersection import Intersection, TrafficLight
+from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
 from sim_utils.utils import Coord
-from config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
+from traffic_controller import Controller
 
 
 class SimMain:
@@ -57,13 +58,13 @@ class SimMain:
 
             # Update traffic light and car
             self.intersection.lanes[1].light.frameUpdate()
-            self.intersection.lanes[1].updateCars(self.screen)
+            # self.intersection.lanes[1].updateCars(self.screen)
             self.intersection.lanes[2].light.frameUpdate()
-            self.intersection.lanes[2].updateCars(self.screen)
+            # self.intersection.lanes[2].updateCars(self.screen)
             self.intersection.lanes[5].light.frameUpdate()
-            self.intersection.lanes[5].updateCars(self.screen)
+            # self.intersection.lanes[5].updateCars(self.screen)
             self.intersection.lanes[7].light.frameUpdate()
-            self.intersection.lanes[7].updateCars(self.screen)
+            # self.intersection.lanes[7].updateCars(self.screen)
             self.maybe_add_car()
 
             self.controller.update()
