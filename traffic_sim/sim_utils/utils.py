@@ -3,13 +3,26 @@ import os
 import pygame
 from pygame.locals import RLEACCEL
 
-from .config import LANE_LENGTH, LANE_WIDTH, ROAD_SEPARATION_WIDTH, WIDTH, HEIGHT
+from .config import LANE_LENGTH, LANE_WIDTH, ROAD_SEPARATION_WIDTH, WIDTH, HEIGHT, FACTOR_SPEED
 
 Coord = namedtuple('Coord', ['x', 'y'])
 
 
 def get_screen_center():
     return Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5)
+
+
+def stopping_distance(speed, braking):
+    frames = speed / braking
+    # # s = 0.5 * a * t^2
+    # distance = 0.5 * braking * frames
+    # s = frames * speed - 0.5 * speed
+    distance = frames * speed - 0.5 * speed
+    return (distance * FACTOR_SPEED) / LANE_LENGTH
+
+
+def stopping_position(position, length, speed, braking):
+    return position + stopping_distance(speed, braking) + (length * 0.5) / LANE_LENGTH
 
 
 # TODO: this should be in intersection, without circularly referencing carlogic and intersection

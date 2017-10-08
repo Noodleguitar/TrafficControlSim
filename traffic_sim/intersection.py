@@ -94,7 +94,7 @@ class Lane:
         prev_car = None
         for car in self.cars:
             # Apply motion of the car
-            car.update_cycle(self, self.queue_length)
+            car.update_cycle(self, self.queue_length, prev_car)
             car.render(self)
             prev_car = car
 

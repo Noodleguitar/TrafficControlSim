@@ -93,23 +93,19 @@ class SimMain:
             rand = random.randint(0, 3)
             if rand == 0:
                 self.intersection.lanes[1].addCar(
-                    Vehicle(64, 32, 'car', 80,
-                            140, 2, WIDTH / 2 - 67, (0, HEIGHT / 2), 'E', WIDTH)
+                    Vehicle('car', 80, 140, 2, 3, 'E')
                 )
             if rand == 1:
                 self.intersection.lanes[2].addCar(
-                    Vehicle(64, 32, 'car', 80,
-                            140, 2, WIDTH / 2 + 8, (WIDTH, HEIGHT / 2 - 37), 'W', 0)
+                    Vehicle('car', 80, 140, 2, 3, 'W')
                 )
             if rand == 2:
                 self.intersection.lanes[7].addCar(
-                    Vehicle(64, 32, 'car', 80,
-                            140, 2, HEIGHT / 2 - 70, (WIDTH / 2 - 37, 0), 'S', 0)
+                    Vehicle('car', 80, 140, 2, 3, 'S')
                 )
             if rand == 3:
                 self.intersection.lanes[5].addCar(
-                    Vehicle(64, 32, 'car', 80,
-                            140, 2, HEIGHT / 2 + 10, (WIDTH / 2, HEIGHT), 'N', HEIGHT)
+                    Vehicle('car', 80, 140, 2, 3, 'N')
                 )
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:

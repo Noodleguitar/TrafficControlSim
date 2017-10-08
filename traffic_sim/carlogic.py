@@ -1,13 +1,12 @@
 import pygame
 
-from sim_utils.config import WIDTH, HEIGHT, LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED
-from sim_utils.utils import load_image, get_screen_center, get_lane_points
+from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE
+from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position
 
 
 class Vehicle(pygame.sprite.Sprite):
-
-    def __init__(self, length: int, width: int, name: str, speed: int, maxSpeed: int,
-                 acceleration: int, turnPoint: int, start, direction, finish):
+    def __init__(self, name: str, speed: int, max_speed: int,
+                 acceleration: int, braking: int, direction):
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
             self.image, self.rect = load_image('car_small_right.png', -1)
@@ -22,38 +21,46 @@ class Vehicle(pygame.sprite.Sprite):
         self.position = 0.0
 
         self.name = name
-        # self.start = start
-        # self.finish = finish
-        self.length = length
-        self.width = width
-        # self.rect = pygame.Rect(self.start[0], self.start[1], self.length, self.width)
-        self.rect = pygame.Rect(0, 0, self.length, self.width)
+        self.width = self.rect.width
+        self.length = self.rect.height
+        self.rect = pygame.Rect(-100, -100, self.rect.width, self.rect.height)
         self.speed = speed
-        self.maxSpeed = maxSpeed
+        self.max_speed = max_speed
         self.acceleration = acceleration
-        # self.turnPoint = turnPoint
+        self.braking = braking
         self.direction = direction
-        # self.hasTurned = False
         self.inQ = False
 
-    def update_cycle(self, lane, queue_length):
-        # TODO: prevent crashes by predicting stopping distance
+    def update_cycle(self, lane, queue_length, previous_car):
         if lane.checklight() == 'green':
+            # Light is green, accelerate
             self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
         elif self.passed_light():
+            # Already passed the light, accelerate
             self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
-        elif self.before_queue(queue_length):
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
-        else:
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
+        elif (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
+              LANE_LIGHT_LOCATION - SAFETY_DISTANCE):
+            # Braking now stops before the light
             self.inQ = True
-            self.speed = 0
+            self.speed = max(0, self.speed - self.braking)
+        elif (previous_car is not None and
+              (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
+               stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
+                                 previous_car.speed, previous_car.braking) -
+               max(previous_car.length, previous_car.width) / LANE_LENGTH) - SAFETY_DISTANCE):
+            # Braking now avoids a collision with the car in front
+            self.inQ = True
+            self.speed = max(0, self.speed - self.braking)
+        else:
+            # No action required, accelerate
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
 
-        if self.position > 1.0:
-            self.kill()
+        # if self.position > 1.0:
+        #     self.kill()
 
     def render(self, lane):
         start, end = get_lane_points(lane, get_screen_center(), center_line=True)
@@ -64,23 +71,22 @@ class Vehicle(pygame.sprite.Sprite):
         if self.direction == 'W':
             self.rect.center = (start.x - self.position * LANE_LENGTH,
                                 start.y)
-        # TODO: rotate car sprite and fix x-direction off-sets
         if self.direction == 'N':
-            self.rect.center = (start.x + self.rect.width * 0.25,
+            self.rect.center = (start.x,
                                 start.y - self.position * LANE_LENGTH)
         if self.direction == 'S':
-            self.rect.center = (start.x + self.rect.width * 0.25,
+            self.rect.center = (start.x,
                                 start.y + self.position * LANE_LENGTH)
 
     def frameUpdate(self, light, qlength, prevCar):
         if light == 'green':
             self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
         elif self.isPassedLight():
             self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
         elif self.beforeQ(qlength):
-            self.speed = min(self.speed + self.acceleration, self.maxSpeed)
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
         else:
             self.inQ = True
             self.speed = 0
