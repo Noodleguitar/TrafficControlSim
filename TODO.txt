@@ -1,0 +1,5 @@
+HIGH priority:
+
+LOW priority:
+- Create Render class
+- Vector class for easier mathing
