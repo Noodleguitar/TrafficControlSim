@@ -70,6 +70,7 @@ class SimMain:
             self.controller.update()
 
             self.intersection.render(self.screen)
+            self.intersection.update_lanes(self.screen)
 
             pygame.display.flip()
 

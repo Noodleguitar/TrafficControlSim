@@ -1,6 +1,6 @@
 import pygame
 
-from sim_utils.config import WIDTH, HEIGHT, LANE_LIGHT_LOCATION, LANE_LENGTH
+from sim_utils.config import WIDTH, HEIGHT, LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED
 from sim_utils.utils import load_image, get_screen_center, get_lane_points
 
 
@@ -36,24 +36,27 @@ class Vehicle(pygame.sprite.Sprite):
         # self.hasTurned = False
         self.inQ = False
 
-    def update(self, lane, queue_length):
+    def update_cycle(self, lane, queue_length):
         # TODO: prevent crashes by predicting stopping distance
-        if lane.light.checklight() == 'green':
+        if lane.checklight() == 'green':
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
         elif self.passed_light():
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
-        elif self.beforeQ(queue_length):
+        elif self.before_queue(queue_length):
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)
         else:
             self.inQ = True
             self.speed = 0
 
-        self.position += self.speed
+        self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
 
-    def render(self, screen, lane):
-        start, end = get_lane_points(lane, get_screen_center())
+        if self.position > 1.0:
+            self.kill()
+
+    def render(self, lane):
+        start, end = get_lane_points(lane, get_screen_center(), center_line=True)
 
         if self.direction == 'E':
             self.rect.center = (start.x + self.position * LANE_LENGTH,
@@ -61,11 +64,12 @@ class Vehicle(pygame.sprite.Sprite):
         if self.direction == 'W':
             self.rect.center = (start.x - self.position * LANE_LENGTH,
                                 start.y)
+        # TODO: rotate car sprite and fix x-direction off-sets
         if self.direction == 'N':
-            self.rect.center = (start.x,
+            self.rect.center = (start.x + self.rect.width * 0.25,
                                 start.y - self.position * LANE_LENGTH)
         if self.direction == 'S':
-            self.rect.center = (start.x,
+            self.rect.center = (start.x + self.rect.width * 0.25,
                                 start.y + self.position * LANE_LENGTH)
 
     def frameUpdate(self, light, qlength):
@@ -107,6 +111,12 @@ class Vehicle(pygame.sprite.Sprite):
 
     def passed_light(self):
         return self.position > LANE_LIGHT_LOCATION
+
+    def before_queue(self, qlength):
+        # TODO
+        if self.position < 0.8:
+            return True
+        return False
 
     def isPassedLight(self):
         loc = self.rect.topleft

@@ -13,7 +13,7 @@ def get_screen_center():
 
 
 # TODO: this should be in intersection, without circularly referencing carlogic and intersection
-def get_lane_points(lane, center: Coord, order_offset=0):
+def get_lane_points(lane, center: Coord, order_offset=0, center_line=False):
     if abs(lane.direction.x) > 0:
         # Horizontal lane
         if lane.direction.x > 0:
@@ -58,7 +58,19 @@ def get_lane_points(lane, center: Coord, order_offset=0):
     end = Coord(start.x + lane.direction.x * LANE_LENGTH,
                 start.y + lane.direction.y * LANE_LENGTH)
 
+    if center_line:
+        # Shift line to center of the lane
+        side_direction = perpendicular(lane.direction)
+        start = Coord(start.x + side_direction.x * LANE_WIDTH * 0.5,
+                      start.y + side_direction.y * LANE_WIDTH * 0.5)
+        end = Coord(end.x + side_direction.x * LANE_WIDTH * 0.5,
+                    end.y + side_direction.y * LANE_WIDTH * 0.5)
+
     return start, end
+
+
+def perpendicular(direction: Coord):
+    return Coord(-direction.y, direction.x)
 
 
 def load_image(name, colorkey=None):

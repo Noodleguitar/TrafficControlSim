@@ -93,15 +93,18 @@ class Lane:
     def update_cars(self, screen):
         for car in self.cars:
             # Apply motion of the car
-            car.update()
-            car.render(screen)
+            car.update_cycle(self, self.queue_length)
+            car.render(self)
 
             if car.inQ:
                 self.queue_length += 5
-            # TODO: move drawing somewhere else?
+            # TODO: move drawing somewhere else
             self.cars.draw(screen)
 
     def checklight(self):
+        # TODO: handle None light exception differently
+        if self.light is None:
+            return 'green'
         return self.light.state
 
 
