@@ -72,7 +72,7 @@ class Vehicle(pygame.sprite.Sprite):
             self.rect.center = (start.x + self.rect.width * 0.25,
                                 start.y + self.position * LANE_LENGTH)
 
-    def frameUpdate(self, light, qlength):
+    def frameUpdate(self, light, qlength, prevCar):
         if light == 'green':
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.maxSpeed)

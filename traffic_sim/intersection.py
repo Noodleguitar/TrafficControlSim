@@ -91,13 +91,15 @@ class Lane:
         self.update_cars(screen)
 
     def update_cars(self, screen):
+        prev_car = None
         for car in self.cars:
             # Apply motion of the car
             car.update_cycle(self, self.queue_length)
             car.render(self)
+            prev_car = car
 
             if car.inQ:
-                self.queue_length += 5
+                self.queue_length += car.length + 5
             # TODO: move drawing somewhere else
             self.cars.draw(screen)
 
