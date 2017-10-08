@@ -1,4 +1,5 @@
 HIGH priority:
+- Order of cars within a lane seems not correct
 
 LOW priority:
 - Create Render class
