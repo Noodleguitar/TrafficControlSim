@@ -6,7 +6,8 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, direction, dataStorage):
+                 acceleration: int, braking: int, direction, dataStorage,
+                 id_: int=-1, debug=False):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
@@ -18,9 +19,13 @@ class Vehicle(pygame.sprite.Sprite):
         if direction == 'S':
             self.image, self.rect = load_image('car_small_down.png', -1)
 
+        # Font for debugging purposes
+        self.font = pygame.font.SysFont("monospace", 14)
+
         # Initially start the car at the start of the lane
         self.position = 0.0
 
+        self.id = id_
         self.name = name
         self.width = self.rect.width
         self.length = self.rect.height
@@ -31,6 +36,8 @@ class Vehicle(pygame.sprite.Sprite):
         self.braking = braking
         self.direction = direction
         self.inQ = False
+
+        self.debug = debug
 
     def update_cycle(self, lane, queue_length, previous_car):
         print(str(self.dataStorage.getTotal()))
@@ -52,11 +59,15 @@ class Vehicle(pygame.sprite.Sprite):
                stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
                                  previous_car.speed, previous_car.braking) -
                max(previous_car.length, previous_car.width) / LANE_LENGTH) - SAFETY_DISTANCE):
+        # elif (previous_car is not None and
+        #       (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
+        #        stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
+        #                          previous_car.speed, previous_car.braking))):
             # Braking now avoids a collision with the car in front
-            self.inQ = True
             self.speed = max(0, self.speed - self.braking)
         else:
             # No action required, accelerate
+            self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
@@ -64,7 +75,7 @@ class Vehicle(pygame.sprite.Sprite):
         # if self.position > 1.0:
         #     self.kill()
 
-    def render(self, lane):
+    def render(self, screen, lane, prev_car):
         start, end = get_lane_points(lane, get_screen_center(), center_line=True)
 
         if self.direction == 'E':
@@ -79,6 +90,15 @@ class Vehicle(pygame.sprite.Sprite):
         if self.direction == 'S':
             self.rect.center = (start.x,
                                 start.y + self.position * LANE_LENGTH)
+        if self.debug:
+            # debug_output = str(round(self.position, 2))
+            previous_id = -1
+            if prev_car is not None:
+                previous_id = prev_car.id
+            debug_output = str(self.id) + ', ' + str(previous_id)
+
+            text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
+            screen.blit(text, self.rect.bottomright)
 
     def frameUpdate(self, light, qlength, prevCar):
         if light == 'green':
