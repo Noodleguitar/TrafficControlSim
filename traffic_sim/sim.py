@@ -27,6 +27,8 @@ class SimMain:
         self.screen = pygame.display.set_mode((
             self.width, self.height))
         pygame.display.set_caption('Traffic Control Simulation')
+        # Initialize font
+        self.font = pygame.font.SysFont('monospace', 14)
 
         self.intersection = Intersection(center=Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5))
         # Add traffic light
@@ -46,6 +48,7 @@ class SimMain:
 
         self.controller = Controller(self.intersection.get_lanes())
 
+        self.frame_timing = pygame.time.Clock()
         self.carframecounter = 0
 
     def MainLoop(self):
@@ -80,6 +83,8 @@ class SimMain:
             # Handle events
             running = self.handle_events()
 
+            self.frame_timing.tick()
+            self.display_fps()
             time.sleep(1.0 / FRAMERATE)
 
     def handle_events(self):
@@ -90,6 +95,12 @@ class SimMain:
                 if event.key == pygame.K_ESCAPE:
                     return False
         return True
+
+    def display_fps(self):
+        # TODO: find out why it does not appear
+        fps = self.frame_timing.get_fps()
+        fps_text = self.font.render(str(fps), 1, (255, 255, 255))
+        self.screen.blit(fps_text, (100, 100))
 
     def maybe_add_car(self):
         if self.carframecounter == 0:
