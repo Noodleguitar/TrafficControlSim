@@ -1,9 +1,8 @@
 #! /usr/bin/env python
 
-import time
-
 import pygame
 import random
+import datetime as dt
 import time
 from datalogging import DataLogging
 
@@ -59,6 +58,8 @@ class SimMain:
 
         running = True
         while running:
+            frame_start = dt.datetime.now()
+
             """Do the Drawing"""
             self.screen.blit(self.background, (0, 0))
 
@@ -78,14 +79,17 @@ class SimMain:
             self.intersection.render(self.screen)
             self.intersection.update_lanes(self.screen)
 
-            pygame.display.flip()
-
             # Handle events
             running = self.handle_events()
 
-            self.frame_timing.tick()
             self.display_fps()
-            time.sleep(1.0 / FRAMERATE)
+
+            pygame.display.flip()
+
+            frame_time = (dt.datetime.now() - frame_start).total_seconds()
+            # pygame.time.delay(int(max(0, (1.0 / FRAMERATE) - frame_time) * 1000))
+            time.sleep(max(0, (1.0 / FRAMERATE) - frame_time))
+            self.frame_timing.tick()
 
     def handle_events(self):
         events = pygame.event.get()
@@ -97,10 +101,9 @@ class SimMain:
         return True
 
     def display_fps(self):
-        # TODO: find out why it does not appear
-        fps = self.frame_timing.get_fps()
-        fps_text = self.font.render(str(fps), 1, (255, 255, 255))
-        self.screen.blit(fps_text, (100, 100))
+        fps = round(self.frame_timing.get_fps())
+        fps_text = self.font.render('FPS: ' + str(fps), 0, (255, 255, 255))
+        self.screen.blit(fps_text, (0, 0))
 
     def maybe_add_car(self):
         if self.carframecounter == 0:
