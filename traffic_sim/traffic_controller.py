@@ -29,6 +29,20 @@ class Controller:
 
         # All lights are red, set longest queue to green
         self.light_lanes[0].light.set_state('green')
+    # def updateDynamic(self):
+    #     self.light_lanes = sorted(self.light_lanes, key=operator.attrgetter('queue_length'), reverse=True)
+    #             for i, l in enumerate(self.light_lanes):
+    #         if l.checklight() == 'yellow':
+    #             # Yellow light on one of the lanes, no action taken
+    #             return
+    #         if l.checklight() == 'green':
+    #             if i > 0 and l.light.get_current_light_time() > greentime:
+    #                 # Lane is not the highest priority at this moment and minimum green time expired,
+    #                 # light can be switched to yellow.
+    #                 l.light.set_state('yellow')
+    #             return
+    #     self.light_lanes[0].light.set_state('green')
+    #     greentime = self.light_lanes.queue_length
 
     @staticmethod
     def gather_light_lanes(lanes):
