@@ -100,8 +100,8 @@ class Lane:
 
             if car.inQ:
                 self.queue_length += car.length + 5
-            # TODO: move drawing somewhere else
-            self.cars.draw(screen)
+        # TODO: move drawing somewhere else
+        self.cars.draw(screen)
 
     def checklight(self):
         # TODO: handle None light exception differently
