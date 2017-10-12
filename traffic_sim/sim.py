@@ -5,7 +5,7 @@ import time
 import pygame
 import random
 import time
-import logging
+import DataLogging
 
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
@@ -17,7 +17,7 @@ from traffic_controller import Controller
 class SimMain:
     def __init__(self):
         """Initialize"""
-        logging.init()
+        DataLogging.init()
         """Initialize PyGame"""
         pygame.init()
         """Set the window Size"""

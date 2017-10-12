@@ -1,5 +1,5 @@
 import pygame
-import logging
+import DataLogging
 
 from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE
 from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position
@@ -97,25 +97,25 @@ class Vehicle(pygame.sprite.Sprite):
         loc = self.rect.topleft
         if self.direction == 'E':
             if loc[0] > self.finish:
-                logging.eastCount += 1
+                DataLogging.eastCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * 0.05, 0)
         if self.direction == 'W':
             if loc[0] < self.finish:
-                logging.westCount += 1
+                DataLogging.westCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * -0.05, 0)
         if self.direction == 'N':
             if loc[1] > self.finish:
-                logging.northCount += 1
+                DataLogging.northCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(0, -self.speed * 0.05)
         if self.direction == 'S':
             if loc[1] < self.finish:
-                logging.southCount += 1
+                DataLogging.southCount += 1
                 self.kill()
             else:
                 self.rect.move_ip(0, self.speed * 0.05)
