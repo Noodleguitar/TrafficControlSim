@@ -1,5 +1,5 @@
 HIGH priority:
-- Order of cars within a lane seems not correct
+- Last car in queue does not brake enough when light goes green
 
 LOW priority:
 - Create Render class
