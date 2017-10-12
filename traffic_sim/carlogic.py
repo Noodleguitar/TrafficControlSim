@@ -1,5 +1,4 @@
 import pygame
-import DataLogging
 
 from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE
 from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position
@@ -7,7 +6,8 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, direction):
+                 acceleration: int, braking: int, direction, dataStorage):
+        self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
             self.image, self.rect = load_image('car_small_right.png', -1)
@@ -33,6 +33,7 @@ class Vehicle(pygame.sprite.Sprite):
         self.inQ = False
 
     def update_cycle(self, lane, queue_length, previous_car):
+        print(str(self.dataStorage.getTotal()))
         if lane.checklight() == 'green':
             # Light is green, accelerate
             self.inQ = False
@@ -96,26 +97,26 @@ class Vehicle(pygame.sprite.Sprite):
     def move(self):
         loc = self.rect.topleft
         if self.direction == 'E':
-            if loc[0] > self.finish:
-                DataLogging.eastCount += 1
+            if self.position > 1.0:
+                self.dataStorage.addEast()
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * 0.05, 0)
         if self.direction == 'W':
-            if loc[0] < self.finish:
-                DataLogging.westCount += 1
+            if self.position < 1.0:
+                self.dataStorage.addWest()
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * -0.05, 0)
         if self.direction == 'N':
-            if loc[1] > self.finish:
-                DataLogging.northCount += 1
+            if self.position > 1.0:
+                self.dataStorage.addNorth()
                 self.kill()
             else:
                 self.rect.move_ip(0, -self.speed * 0.05)
         if self.direction == 'S':
-            if loc[1] < self.finish:
-                DataLogging.southCount += 1
+            if self.position < 1.0:
+                self.dataStorage.addSouth()
                 self.kill()
             else:
                 self.rect.move_ip(0, self.speed * 0.05)

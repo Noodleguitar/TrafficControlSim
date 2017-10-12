@@ -5,7 +5,7 @@ import time
 import pygame
 import random
 import time
-import DataLogging
+from datalogging import DataLogging
 
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
@@ -17,7 +17,7 @@ from traffic_controller import Controller
 class SimMain:
     def __init__(self):
         """Initialize"""
-        DataLogging.init()
+        self.dataStorage = DataLogging()
         """Initialize PyGame"""
         pygame.init()
         """Set the window Size"""
@@ -96,19 +96,19 @@ class SimMain:
             rand = random.randint(0, 3)
             if rand == 0:
                 self.intersection.lanes[1].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'E')
+                    Vehicle('car', 80, 140, 2, 3, 'E',self.dataStorage)
                 )
             if rand == 1:
                 self.intersection.lanes[2].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'W')
+                    Vehicle('car', 80, 140, 2, 3, 'W',self.dataStorage)
                 )
             if rand == 2:
                 self.intersection.lanes[7].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'S')
+                    Vehicle('car', 80, 140, 2, 3, 'S',self.dataStorage)
                 )
             if rand == 3:
                 self.intersection.lanes[5].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'N')
+                    Vehicle('car', 80, 140, 2, 3, 'N',self.dataStorage)
                 )
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:
