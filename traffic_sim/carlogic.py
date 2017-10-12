@@ -35,11 +35,11 @@ class Vehicle(pygame.sprite.Sprite):
         self.braking = braking
         self.direction = direction
         self.inQ = False
+        self.reached_destination = False
 
         self.debug = debug
 
     def update_cycle(self, lane, queue_length, previous_car):
-        print(str(self.dataStorage.getTotal()))
         if lane.checklight() == 'green':
             # Light is green, accelerate
             self.inQ = False
@@ -67,8 +67,11 @@ class Vehicle(pygame.sprite.Sprite):
 
         self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
 
-        # if self.position > 1.0:
-        #     self.kill()
+        if self.position > 1.0:
+            if not self.reached_destination:
+                self.dataStorage.add_destination(self.direction)
+                self.reached_destination = True
+            # self.kill()
 
     def render(self, screen, lane, prev_car):
         start, end = get_lane_points(lane, get_screen_center(), center_line=True)
