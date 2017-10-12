@@ -100,8 +100,15 @@ class Lane:
 
             if car.inQ:
                 self.queue_length += car.length + 5
-            # TODO: move drawing somewhere else
-            self.cars.draw(screen)
+
+            #  for car in self.cars_sprites:
+            #  if not car.inQ and car.isPassedLight:
+            #  time = (car.location - queue_length)/car.maxspeed
+            #  if(time <=( (delay * nrCarsInQ) + acctime )):
+            #        qlength += car.length + 5
+            #        nrCarsInQ += 1
+        # TODO: move drawing somewhere else
+        self.cars.draw(screen)
 
     def checklight(self):
         # TODO: handle None light exception differently
