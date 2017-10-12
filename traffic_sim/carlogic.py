@@ -6,7 +6,7 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, direction, id_: int=-1, debug=False):
+                 acceleration: int, braking: int, direction, id_: int = -1, debug=False):
         pygame.sprite.Sprite.__init__(self)
         if direction == 'E':
             self.image, self.rect = load_image('car_small_right.png', -1)
@@ -55,11 +55,7 @@ class Vehicle(pygame.sprite.Sprite):
               (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
                stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
                                  previous_car.speed, previous_car.braking) -
-               max(previous_car.length, previous_car.width) / LANE_LENGTH) - SAFETY_DISTANCE):
-        # elif (previous_car is not None and
-        #       (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
-        #        stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
-        #                          previous_car.speed, previous_car.braking))):
+               max(previous_car.length, previous_car.width) / LANE_LENGTH - SAFETY_DISTANCE)):
             # Braking now avoids a collision with the car in front
             self.speed = max(0, self.speed - self.braking)
         else:
