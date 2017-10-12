@@ -73,7 +73,8 @@ class Lane:
         self.towards = towards
         self.order = order
         self.light = light
-        self.cars = pygame.sprite.Group()
+        self.car_sprites = pygame.sprite.Group()
+        self.cars = list()
         self.queue_length = 0
 
         if (light is not None) and (not towards):
@@ -81,7 +82,9 @@ class Lane:
                              'intersection')
 
     def addCar(self, v: Vehicle):
-        self.cars.add(v)
+        self.cars.append(v)
+        self.cars[-1].id = len(self.cars) - 1
+        self.car_sprites.add(v)
 
     def update_lane(self, screen):
         # Clear queue if light is green
@@ -93,15 +96,18 @@ class Lane:
     def update_cars(self, screen):
         prev_car = None
         for car in self.cars:
+            if prev_car is not None:
+                assert prev_car is not car
+
             # Apply motion of the car
             car.update_cycle(self, self.queue_length, prev_car)
-            car.render(self)
+            car.render(screen, self, prev_car)
             prev_car = car
 
             if car.inQ:
                 self.queue_length += car.length + 5
         # TODO: move drawing somewhere else
-        self.cars.draw(screen)
+        self.car_sprites.draw(screen)
 
     def checklight(self):
         # TODO: handle None light exception differently

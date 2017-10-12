@@ -7,7 +7,7 @@ import random
 
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
-from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES
+from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG
 from sim_utils.utils import Coord
 from traffic_controller import Controller
 
@@ -93,19 +93,19 @@ class SimMain:
             rand = random.randint(0, 3)
             if rand == 0:
                 self.intersection.lanes[1].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'E')
+                    Vehicle('car', 80, 140, 2, 3, 'E', debug=DEBUG)
                 )
             if rand == 1:
                 self.intersection.lanes[2].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'W')
+                    Vehicle('car', 80, 140, 2, 3, 'W', debug=DEBUG)
                 )
             if rand == 2:
                 self.intersection.lanes[7].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'S')
+                    Vehicle('car', 80, 140, 2, 3, 'S', debug=DEBUG)
                 )
             if rand == 3:
                 self.intersection.lanes[5].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'N')
+                    Vehicle('car', 80, 140, 2, 3, 'N', debug=DEBUG)
                 )
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:
