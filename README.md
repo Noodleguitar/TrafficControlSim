@@ -1,7 +1,7 @@
 # TrafficControlSim
 Smart traffic control simulation as part of a multi-agents systems course.
 
-##Requirements
+## Requirements
 * Python >=3.4
 * pygame
 
