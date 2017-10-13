@@ -6,22 +6,24 @@
 %% \documentstyle[bnaic]{article}
 
 %% begin document with title, author and affiliations
-\begin{document}
-\title{\textbf{\huge Traffic Control Simulation - Report v.0}}
+
+\title{\textbf{\huge Traffic Control Simulation - Report v.1}}
 \author{Elbert Fliek (s1917188) \affila \and
     Albert Thie (s1652184) \affila \and
     No\"el L\"uneburg (s1773135) \affila}
-\date{\affila\ \textit{University of Groningen}}
-\ttl
+\date{\affila\ \textit{University of Groningen \\
+\today}}
+
 \pagestyle{empty}
 
+\begin{document}
+\ttl
+\thispagestyle{empty}
+
 \begin{abstract}
-    Improving the amount of thoroughfare at crossroads using traffic lights has been a topic of research in urban planning and traffic engineering. Multiple system have been designed to increase traffic flow in intersections using sensors in traffic lights and optimization based on traffic data. Our research shows the advantage of applying a state of art sorting algorithm and combining this with information about the travelling direction of individual cars. Thus taking advantage of communicating traffic lights and individual cars, we hope to improve traffic flow in intersections. Simulations show..."enter results"  
+    Improving the amount of thoroughfare at crossroads using traffic lights has been a topic of research in urban planning and traffic engineering. Multiple systems have been designed to increase traffic flow in intersections using sensors in traffic lights and optimization based on traffic data. Our research shows the advantage of applying a state of art sorting algorithm and combining this with information about the traveling direction of individual cars. Thus taking advantage of communicating traffic lights and individual cars, we hope to improve traffic flow in intersections. Results to be added in a later version.
+% Simulations show..."enter results"  
 \end{abstract}
-
-
-
-
 
 %\begin{abstract}
 %\noindent
@@ -30,25 +32,22 @@
 
 \section{Introduction}
 \subsection{The problem}
-Optimizing the traffic flow is a problem which has been studied with computational model in a variety of ways. One possible approach is modelling the behavior of traffic by using natural laws, such as those governing the expansions and transfer of kinetic gas \cite{helbing2001master}. This however, does not solve the problem of optimizing the traffic lights at an intersection. To increase the amount of traffic that can pass an intersection, and reduce the wait time at the intersection, other models are needed.
+Optimizing the traffic flow is a problem which has been studied with computational models in a variety of ways. One possible approach is modelling the behavior of traffic by using natural laws, such as those governing the expansions and transfer of kinetic gas \cite{helbing2001master}. This however, does not solve the problem of optimizing the traffic lights at an intersection. To increase the amount of traffic that can pass an intersection, and reduce the wait time at the intersection, other models are needed.
 
 \subsection{State of the Art}
 According to Li et. al\cite{survey2014} the problem of intersection management can be tackled with a combination of not only optimizing the sorting algorithm that schedules green lights based on queue length, but also using predictions of future traffic reaching the intersection. These predictions can be based on data gathered over time at an intersection, thus identifying times of heavy traffic. Their overview however only identifies possible approaches to the problem and not an actual implementation that can be simulated.
 
-L{\"a}mmer et. al. \cite{self_control2008} however created a simulation based on fluid dynamics.  L{\"a}mmer et. al. view the problem of intersections as an multi-agent problem, where both traffic lights and individual vehicles interact together. Traffic lights assign priority among each other by detecting not only waiting traffic, but also oncoming traffic. Oncoming traffic indicates its current speed and project trajectory, allowing traffic lights to take this into account when deciding priority among themselves. This allows for platoon of oncoming vehicles to influence decision making in a traffic light. Through the pressure of "future"  cars, the green wave effect for a platoon of cars can be created emergently.
+L{\"a}mmer et. al. \cite{self_control2008} however created a simulation based on fluid dynamics.  L{\"a}mmer et. al. view the problem of intersections as a multi-agent problem, where both traffic lights and individual vehicles interact together. Traffic lights assign priority among each other by detecting not only waiting traffic, but also oncoming traffic. Oncoming traffic indicates its current speed and project trajectory, allowing traffic lights to take this into account when deciding priority among themselves. This allows for platoon of oncoming vehicles to influence decision making in a traffic light. Through the pressure of "future"  cars, the green wave effect for a platoon of cars can be created emergently.
 
-This approach was tested not only in traffic simulations, but also implemented in two real life intersections in the city of Dresden. \cite{site} The real life notable increased traffic flow and allowed for preferential treatment for public transport vehicles, further helping the cities infrastructure.
+This approach was tested not only in traffic simulations, but also implemented in two real life intersections in the city of Dresden \cite{site}. The real life application notably increased traffic flow and allowed for preferential treatment for public transport vehicles, further helping the city's infrastructure.
 
 
 \subsection{New Idea}
-
-The current simulation by L{\"a}mmer et. al. assumes that while the problem is modelled as a multi agent system, the traffic lights themselves do all of the decision making. The only "input" from vehicles is there presence and probable trajectory and speed, which are detected by cameras. However, with the development of smart cars, vehicles could also transmit the information about their destination towards the traffic lights. More importantly, they can transmit in which direction they will go once on the intersection. This information allows traffic lights to increase their efficiency by taking this route information into account. If for example two opposing lanes take only contain vehicles which wish to go straight on or move to their right (assuming a country where the default road placement is on the right), the lights of both sides could remain green until a vehicle appears that wishes to go left. This is useful in intersections where dedicated lanes are not an option due to space or financial limitations. 
+The current simulation by L{\"a}mmer et. al. assumes that while the problem is modelled as a multi-agent system, the traffic lights themselves do all of the decision making. The only "input" from vehicles is their presence and probable trajectory and speed, which are detected by cameras. However, with the development of smart cars, vehicles could also transmit the information about their destination to the traffic lights. More importantly, they can transmit in which direction they will go once on the intersection. This information allows traffic lights to increase their efficiency by taking this route information into account. If for example two opposing lanes only contain vehicles which wish to go straight on or move to their right (assuming a country where the driving side is on the right), the lights of both sides could remain green until a vehicle appears that wishes to go left. This is useful in intersections where dedicated lanes are not an option due to space or financial limitations. 
 
 
 
 \section{Method}
-TODO. %description of dynamic queue method and communication between traffic lights.
-
 The dynamic queue by L{\"a}mmer et. al. is compared to regular traffic control systems in a simulation environment. Both systems use a four square intersections with vehicles approaching at random intervals from all sides. Intervals are increased and decreased to measure the effects of high and low traffic flow situations. 
 
 Time in the simulation is measured in frames, while individual of vehicles is measured in traversed pixels. This abstraction allows for vehicles speed, brake and acceleration time to be measured in screen movement.
@@ -57,7 +56,7 @@ The regular traffic system used a fixed green time for each traffic light, follo
 
 The dynamic system uses a queue based approach, where the amount of vehicles in the queue determines not only which light will be green next, but also the time the light will remain green. Green time is decided by the amount of present and approaching cars in the queue, the amount of start up time needed for cars to start moving and the time needed to clear the intersection after all cars have left. 
 
-Pressure is exerted 
+%Pressure is exerted 
 
 
 \subsection{Simulation environment}
