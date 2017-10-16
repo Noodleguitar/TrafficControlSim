@@ -106,24 +106,30 @@ class SimMain:
         self.screen.blit(fps_text, (0, 0))
 
     def maybe_add_car(self):
+        # TODO: check destination lanes
+        routes = [
+            (1, 0, 'E', 'E'),
+            (1, 4, 'E', 'N'),
+            (1, 6, 'E', 'S'),
+            (2, 3, 'W', 'W'),
+            (2, 4, 'W', 'N'),
+            (2, 6, 'W', 'S'),
+            (5, 0, 'N', 'N'),
+            (5, 3, 'N', 'W'),
+            (5, 6, 'N', 'E'),
+            (7, 0, 'S', 'S'),
+            (7, 3, 'S', 'W'),
+            (7, 4, 'S', 'E'),
+        ]
         if self.carframecounter == 0:
-            rand = random.randint(0, 3)
-            if rand == 0:
-                self.intersection.lanes[1].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'E', self.dataStorage, debug=DEBUG)
-                )
-            if rand == 1:
-                self.intersection.lanes[2].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'W', self.dataStorage, debug=DEBUG)
-                )
-            if rand == 2:
-                self.intersection.lanes[7].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'S', self.dataStorage, debug=DEBUG)
-                )
-            if rand == 3:
-                self.intersection.lanes[5].addCar(
-                    Vehicle('car', 80, 140, 2, 3, 'N', self.dataStorage, debug=DEBUG)
-                )
+            route = routes[random.randint(0, len(routes) - 1)]
+            next_lane = (self.intersection.lanes[route[1]], route[3])
+            self.intersection.lanes[route[0]].addCar(
+                Vehicle(
+                    'car', 80, 140, 2, 3, route[2], self.dataStorage,
+                    next_lane, debug=DEBUG)
+            )
+
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:
             self.carframecounter = 0

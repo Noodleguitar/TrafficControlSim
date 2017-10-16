@@ -6,17 +6,11 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, direction,  dataStorage, id_: int = -1, debug=False):
+                 acceleration: int, braking: int, direction,  dataStorage, next_lane, id_: int = -1, debug=False):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
-        if direction == 'E':
-            self.image, self.rect = load_image('car_small_right.png', -1)
-        if direction == 'W':
-            self.image, self.rect = load_image('car_small_left.png', -1)
-        if direction == 'N':
-            self.image, self.rect = load_image('car_small_up.png', -1)
-        if direction == 'S':
-            self.image, self.rect = load_image('car_small_down.png', -1)
+
+        self.changeDirection(direction)
 
         # Font for debugging purposes
         self.font = pygame.font.SysFont("monospace", 14)
@@ -24,6 +18,7 @@ class Vehicle(pygame.sprite.Sprite):
         # Initially start the car at the start of the lane
         self.position = 0.0
 
+        self.next_lane = next_lane
         self.id = id_
         self.name = name
         self.width = self.rect.width
@@ -33,7 +28,6 @@ class Vehicle(pygame.sprite.Sprite):
         self.max_speed = max_speed
         self.acceleration = acceleration
         self.braking = braking
-        self.direction = direction
         self.inQ = False
         self.reached_destination = False
 
@@ -71,7 +65,11 @@ class Vehicle(pygame.sprite.Sprite):
             if not self.reached_destination:
                 self.dataStorage.add_destination(self.direction)
                 self.reached_destination = True
-            # self.kill()
+                if self.next_lane:
+                    self.next_lane[0].addCar(
+                        Vehicle('car', 80, 140, 2, 3, self.next_lane[1], self.dataStorage, None, debug=self.debug)
+                    )
+                    self.kill()
 
     def render(self, screen, lane, prev_car):
         start, end = get_lane_points(lane, get_screen_center(), center_line=True)
@@ -116,12 +114,14 @@ class Vehicle(pygame.sprite.Sprite):
         loc = self.rect.topleft
         if self.direction == 'E':
             if self.position > 1.0:
+                self.changeDirection('N')
                 self.dataStorage.addEast()
                 self.kill()
             else:
                 self.rect.move_ip(self.speed * 0.05, 0)
         if self.direction == 'W':
             if self.position < 1.0:
+                self.changeDirection('N')
                 self.dataStorage.addWest()
                 self.kill()
             else:
@@ -134,6 +134,7 @@ class Vehicle(pygame.sprite.Sprite):
                 self.rect.move_ip(0, -self.speed * 0.05)
         if self.direction == 'S':
             if self.position < 1.0:
+                self.changeDirection('N')
                 self.dataStorage.addSouth()
                 self.kill()
             else:
@@ -178,3 +179,14 @@ class Vehicle(pygame.sprite.Sprite):
         if self.direction == 'S' and (loc[1] < (self.turnPoint - qlength)):
             return True
         return False
+
+    def changeDirection(self, direction):
+        self.direction = direction
+        if direction == 'E':
+            self.image, self.rect = load_image('car_small_right.png', -1)
+        if direction == 'W':
+            self.image, self.rect = load_image('car_small_left.png', -1)
+        if direction == 'N':
+            self.image, self.rect = load_image('car_small_up.png', -1)
+        if direction == 'S':
+            self.image, self.rect = load_image('car_small_down.png', -1)
