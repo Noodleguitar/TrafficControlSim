@@ -1,5 +1,6 @@
 HIGH priority:
 - Last car in queue does not brake enough when light goes green
+- After some time simulating, cars start to run red lights for some reason.
 
 LOW priority:
 - Create Render class
