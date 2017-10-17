@@ -79,7 +79,7 @@ class Lane:
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
-                             'intersection')
+                             'intersection.')
 
     def addCar(self, v: Vehicle):
         self.cars.append(v)
@@ -89,18 +89,21 @@ class Lane:
     def update_lane(self, screen):
         # Clear queue if light is green
         if self.checklight() == 'green':
-            self.queue_length = 50
+            self.queue_length = 0
 
         self.update_cars(screen)
 
     def update_cars(self, screen):
+        removed_idcs = list()
         prev_car = None
-        for car in self.cars:
+        for i, car in enumerate(self.cars):
             if prev_car is not None:
                 assert prev_car is not car
 
             # Apply motion of the car
-            car.update_cycle(self, self.queue_length, prev_car)
+            if not car.update_cycle(self, self.queue_length, prev_car):
+                # Car should be deleted
+                removed_idcs.append(i)
             car.render(screen, self, prev_car)
             prev_car = car
 
@@ -113,6 +116,11 @@ class Lane:
             #  if(time <=( (delay * nrCarsInQ) + acctime )):
             #        qlength += car.length + 5
             #        nrCarsInQ += 1
+
+        # Remove deleted cars from list
+        for index in sorted(removed_idcs, reverse=True):
+            del self.cars[index]
+
         # TODO: move drawing somewhere else
         self.car_sprites.draw(screen)
 

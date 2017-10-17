@@ -34,26 +34,30 @@ class Vehicle(pygame.sprite.Sprite):
         self.debug = debug
 
     def update_cycle(self, lane, queue_length, previous_car):
-        if lane.checklight() == 'green':
+        if (previous_car is not None and
+            (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
+             stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
+                               previous_car.speed, previous_car.braking) -
+             max(previous_car.length, previous_car.width) / LANE_LENGTH - SAFETY_DISTANCE)):
+            # Braking now avoids a collision with the car in front
+            self.speed = max(0, self.speed - self.braking)
+
+        elif lane.checklight() == 'green':
             # Light is green, accelerate
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
+
         elif self.passed_light():
             # Already passed the light, accelerate
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
+
         elif (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
               LANE_LIGHT_LOCATION - SAFETY_DISTANCE):
             # Braking now stops before the light
             self.inQ = True
             self.speed = max(0, self.speed - self.braking)
-        elif (previous_car is not None and
-              (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
-               stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
-                                 previous_car.speed, previous_car.braking) -
-               max(previous_car.length, previous_car.width) / LANE_LENGTH - SAFETY_DISTANCE)):
-            # Braking now avoids a collision with the car in front
-            self.speed = max(0, self.speed - self.braking)
+
         else:
             # No action required, accelerate
             self.inQ = False
@@ -67,9 +71,14 @@ class Vehicle(pygame.sprite.Sprite):
                 self.reached_destination = True
                 if self.next_lane:
                     self.next_lane[0].addCar(
-                        Vehicle('car', 80, 140, 2, 3, self.next_lane[1], self.dataStorage, None, debug=self.debug)
+                        Vehicle(self.name, self.speed, self.max_speed,
+                                self.acceleration, self.braking,
+                                self.next_lane[1], self.dataStorage, None, debug=self.debug)
                     )
-                    self.kill()
+            self.kill()
+            return False
+
+        return True
 
     def render(self, screen, lane, prev_car):
         start, end = get_lane_points(lane, get_screen_center(), center_line=True)
@@ -91,54 +100,55 @@ class Vehicle(pygame.sprite.Sprite):
             previous_id = -1
             if prev_car is not None:
                 previous_id = prev_car.id
-            debug_output = str(self.id) + ', ' + str(previous_id)
+            # debug_output = str(self.id) + ', ' + str(previous_id)
+            debug_output = str(self.direction)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
             screen.blit(text, self.rect.bottomright)
 
-    def frameUpdate(self, light, qlength, prevCar):
-        if light == 'green':
-            self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.max_speed)
-        elif self.isPassedLight():
-            self.inQ = False
-            self.speed = min(self.speed + self.acceleration, self.max_speed)
-        elif self.beforeQ(qlength):
-            self.speed = min(self.speed + self.acceleration, self.max_speed)
-        else:
-            self.inQ = True
-            self.speed = 0
-        self.move()
+    # def frameUpdate(self, light, qlength, prevCar):
+    #     if light == 'green':
+    #         self.inQ = False
+    #         self.speed = min(self.speed + self.acceleration, self.max_speed)
+    #     elif self.isPassedLight():
+    #         self.inQ = False
+    #         self.speed = min(self.speed + self.acceleration, self.max_speed)
+    #     elif self.beforeQ(qlength):
+    #         self.speed = min(self.speed + self.acceleration, self.max_speed)
+    #     else:
+    #         self.inQ = True
+    #         self.speed = 0
+    #     self.move()
 
-    def move(self):
-        loc = self.rect.topleft
-        if self.direction == 'E':
-            if self.position > 1.0:
-                self.changeDirection('N')
-                self.dataStorage.addEast()
-                self.kill()
-            else:
-                self.rect.move_ip(self.speed * 0.05, 0)
-        if self.direction == 'W':
-            if self.position < 1.0:
-                self.changeDirection('N')
-                self.dataStorage.addWest()
-                self.kill()
-            else:
-                self.rect.move_ip(self.speed * -0.05, 0)
-        if self.direction == 'N':
-            if self.position > 1.0:
-                self.dataStorage.addNorth()
-                self.kill()
-            else:
-                self.rect.move_ip(0, -self.speed * 0.05)
-        if self.direction == 'S':
-            if self.position < 1.0:
-                self.changeDirection('N')
-                self.dataStorage.addSouth()
-                self.kill()
-            else:
-                self.rect.move_ip(0, self.speed * 0.05)
+    # def move(self):
+    #     loc = self.rect.topleft
+    #     if self.direction == 'E':
+    #         if self.position > 1.0:
+    #             self.changeDirection('N')
+    #             self.dataStorage.addEast()
+    #             self.kill()
+    #         else:
+    #             self.rect.move_ip(self.speed * 0.05, 0)
+    #     if self.direction == 'W':
+    #         if self.position < 1.0:
+    #             self.changeDirection('N')
+    #             self.dataStorage.addWest()
+    #             self.kill()
+    #         else:
+    #             self.rect.move_ip(self.speed * -0.05, 0)
+    #     if self.direction == 'N':
+    #         if self.position > 1.0:
+    #             self.dataStorage.addNorth()
+    #             self.kill()
+    #         else:
+    #             self.rect.move_ip(0, -self.speed * 0.05)
+    #     if self.direction == 'S':
+    #         if self.position < 1.0:
+    #             self.changeDirection('N')
+    #             self.dataStorage.addSouth()
+    #             self.kill()
+    #         else:
+    #             self.rect.move_ip(0, self.speed * 0.05)
 
     def passed_light(self):
         return self.position > LANE_LIGHT_LOCATION
@@ -149,36 +159,36 @@ class Vehicle(pygame.sprite.Sprite):
             return True
         return False
 
-    def isPassedLight(self):
-        loc = self.rect.topleft
-        if self.direction == 'E':
-            if loc[0] > self.turnPoint:
-                return True
-
-        if self.direction == 'W':
-            if loc[0] < self.turnPoint:
-                return True
-
-        if self.direction == 'N':
-            if loc[1] < self.turnPoint:
-                return True
-
-        if self.direction == 'S':
-            if loc[1] > self.turnPoint:
-                return True
-        return False
-
-    def beforeQ(self, qlength):
-        loc = self.rect.topleft
-        if self.direction == 'E' and (loc[0] < (self.turnPoint - qlength)):
-            return True
-        if self.direction == 'W' and (loc[0] > (self.turnPoint + qlength)):
-            return True
-        if self.direction == 'N' and (loc[1] > (self.turnPoint + qlength)):
-            return True
-        if self.direction == 'S' and (loc[1] < (self.turnPoint - qlength)):
-            return True
-        return False
+    # def isPassedLight(self):
+    #     loc = self.rect.topleft
+    #     if self.direction == 'E':
+    #         if loc[0] > self.turnPoint:
+    #             return True
+    #
+    #     if self.direction == 'W':
+    #         if loc[0] < self.turnPoint:
+    #             return True
+    #
+    #     if self.direction == 'N':
+    #         if loc[1] < self.turnPoint:
+    #             return True
+    #
+    #     if self.direction == 'S':
+    #         if loc[1] > self.turnPoint:
+    #             return True
+    #     return False
+    #
+    # def beforeQ(self, qlength):
+    #     loc = self.rect.topleft
+    #     if self.direction == 'E' and (loc[0] < (self.turnPoint - qlength)):
+    #         return True
+    #     if self.direction == 'W' and (loc[0] > (self.turnPoint + qlength)):
+    #         return True
+    #     if self.direction == 'N' and (loc[1] > (self.turnPoint + qlength)):
+    #         return True
+    #     if self.direction == 'S' and (loc[1] < (self.turnPoint - qlength)):
+    #         return True
+    #     return False
 
     def changeDirection(self, direction):
         self.direction = direction
