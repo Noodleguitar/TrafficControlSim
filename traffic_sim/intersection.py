@@ -9,6 +9,7 @@ class Intersection:
     def __init__(self, center: Coord):
         self.center = center
         self.lanes = list()
+        self.blocked = False
         # self.signals = list()
 
     def get_lanes(self):

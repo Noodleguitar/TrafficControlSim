@@ -6,7 +6,8 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, direction,  dataStorage, next_lane, id_: int = -1, debug=False):
+                 acceleration: int, braking: int, turn_rate: int,
+                 direction: str,  dataStorage, next_lane, id_: int = -1, debug=False):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
 
@@ -27,18 +28,31 @@ class Vehicle(pygame.sprite.Sprite):
         self.speed = speed
         self.max_speed = max_speed
         self.acceleration = acceleration
+        self.turn_rate = turn_rate
         self.braking = braking
         self.inQ = False
+        self.turning = False
+        self.turning_start = None
         self.reached_destination = False
+        self.ticks = 0
 
         self.debug = debug
 
+        if self.next_lane and not self.direction_change(self.next_lane, self.direction):
+            # No direction change, zero turn rate
+            self.turn_rate = 0
+
     def update_cycle(self, lane, queue_length, previous_car):
-        if (previous_car is not None and
-            (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
-             stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
-                               previous_car.speed, previous_car.braking) -
-             max(previous_car.length, previous_car.width) / LANE_LENGTH - SAFETY_DISTANCE)):
+        self.ticks += 1
+
+        if self.turning and self.direction_change(self.next_lane, self.direction):
+            self.speed = 0
+
+        elif (previous_car is not None and
+              (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
+               stopping_position(previous_car.position, max(previous_car.length, previous_car.width),
+                                 previous_car.speed, previous_car.braking) -
+               max(previous_car.length, previous_car.width) / LANE_LENGTH - SAFETY_DISTANCE)):
             # Braking now avoids a collision with the car in front
             self.speed = max(0, self.speed - self.braking)
 
@@ -63,21 +77,44 @@ class Vehicle(pygame.sprite.Sprite):
             self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
+        if (previous_car is not None and
+            previous_car.position > LANE_LIGHT_LOCATION and
+            self.direction_change(previous_car.next_lane, previous_car.direction)):
+            # Car in front is turning, wait at light
+            self.speed = max(0, self.speed - self.braking)
+
         self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
 
+        # TODO: debug
+        self.queue_length = queue_length
+
+        keep_car = True
         if self.position > 1.0:
-            if not self.reached_destination:
+            if self.next_lane:
+                # Car transitions to next lane
+                if self.turning:
+                    if self.ticks - self.turning_start > self.turn_rate:
+                        # Car is done turning, remove car, add one to next lane
+                        self.turning = False
+                        keep_car = False
+                        self.next_lane[0].addCar(
+                            Vehicle(self.name, self.speed, self.max_speed,
+                                    self.acceleration, self.braking, self.turn_rate,
+                                    self.next_lane[1], self.dataStorage, None, debug=self.debug)
+                        )
+                else:
+                    # Start turning on the intersection
+                    self.turning = True
+                    self.turning_start = self.ticks
+            else:
+                # Car has reached destination
                 self.dataStorage.add_destination(self.direction)
-                self.reached_destination = True
-                if self.next_lane:
-                    self.next_lane[0].addCar(
-                        Vehicle(self.name, self.speed, self.max_speed,
-                                self.acceleration, self.braking,
-                                self.next_lane[1], self.dataStorage, None, debug=self.debug)
-                    )
+                keep_car = False
+
+        if not keep_car:
+            # Remove sprite from group
             self.kill()
             return False
-
         return True
 
     def render(self, screen, lane, prev_car):
@@ -101,7 +138,8 @@ class Vehicle(pygame.sprite.Sprite):
             if prev_car is not None:
                 previous_id = prev_car.id
             # debug_output = str(self.id) + ', ' + str(previous_id)
-            debug_output = str(self.direction)
+            # debug_output = str(self.direction)
+            debug_output = str(self.queue_length)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
             screen.blit(text, self.rect.bottomright)
@@ -156,6 +194,12 @@ class Vehicle(pygame.sprite.Sprite):
     def before_queue(self, qlength):
         # TODO
         if self.position < 0.8:
+            return True
+        return False
+
+    @staticmethod
+    def direction_change(next_lane, direction):
+        if next_lane and next_lane[1] != direction:
             return True
         return False
 

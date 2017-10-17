@@ -1,11 +1,22 @@
 WIDTH = 1600
 HEIGHT = 900
-FRAMERATE = 60
+FRAMERATE = 100
 DEBUG = False
 
-CAR_EVERY_FRAMES = 50
+CAR_EVERY_FRAMES = 90
 MIN_GREEN_TIME = 240
 SAFETY_DISTANCE = 0.01
+
+
+# Normal car
+class VehicleCar:
+    name = 'car'
+    speed = 50
+    max_speed = 90
+    acceleration = 1
+    braking = 2
+    turning_rate = 10
+# TODO: other types of vehicles
 
 FACTOR_SPEED = 0.05
 

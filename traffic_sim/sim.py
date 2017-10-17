@@ -8,7 +8,7 @@ from datalogging import DataLogging
 
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
-from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG
+from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar
 from sim_utils.utils import Coord
 from traffic_controller import Controller
 
@@ -103,7 +103,6 @@ class SimMain:
         self.screen.blit(fps_text, (0, 0))
 
     def maybe_add_car(self):
-        # TODO: check destination lanes
         routes = [
             (1, 0, 'E', 'E'),
             (1, 4, 'E', 'N'),
@@ -121,9 +120,13 @@ class SimMain:
         if self.carframecounter == 0:
             route = routes[random.randint(0, len(routes) - 1)]
             next_lane = (self.intersection.lanes[route[1]], route[3])
+            # Select type of vehicle
+            vehicle = VehicleCar()
             self.intersection.lanes[route[0]].addCar(
                 Vehicle(
-                    'car', 50, 90, 1, 2, route[2], self.dataStorage,
+                    vehicle.name, vehicle.speed, vehicle.max_speed,
+                    vehicle.acceleration, vehicle.braking, vehicle.turning_rate,
+                    route[2], self.dataStorage,
                     next_lane, debug=DEBUG)
             )
 

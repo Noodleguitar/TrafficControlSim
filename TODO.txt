@@ -3,6 +3,8 @@ x Last car in queue does not brake enough when light goes green
 - After some time simulating, cars start to run red lights for some reason.
 - Make sure cars entering away-lanes are not counted towards reaching destinations.
 x Remove cars from lane when switching to another
+- Allowing multiple green lights simultaneously
+    - Intersection blocking should not be either fully blocked or open
 
 LOW priority:
 - Create Render class
