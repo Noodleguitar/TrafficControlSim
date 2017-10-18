@@ -13,6 +13,7 @@ LANE_LIGHT_LOCATION = 0.95
 LANE_WIDTH = 35
 LANE_LENGTH = 1000
 ROAD_SEPARATION_WIDTH = 2
+METHOD = "Laemmer"
 
 LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'yellow':  (255, 255, 0),

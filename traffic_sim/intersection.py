@@ -1,7 +1,7 @@
 import pygame
 
 from carlogic import Vehicle
-from sim_utils.config import LANE_LIGHT_LOCATION, LIGHT_COLOURS, LANE_WIDTH
+from sim_utils.config import LANE_LIGHT_LOCATION, LIGHT_COLOURS, LANE_WIDTH, LANE_LENGTH, METHOD
 from sim_utils.utils import Coord, get_lane_points
 
 
@@ -77,6 +77,7 @@ class Lane:
         self.car_sprites = pygame.sprite.Group()
         self.cars = list()
         self.queue_length = 0
+        self.delay = 15
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
@@ -105,12 +106,6 @@ class Lane:
             car.render(screen, self, prev_car)
             prev_car = car
 
-            #  for car in self.cars_sprites:
-            #  if not car.inQ and car.isPassedLight:
-            #  time = (car.location - queue_length)/car.maxspeed
-            #  if(time <=( (delay * nrCarsInQ) + acctime )):
-            #        qlength += car.length + 5
-            #        nrCarsInQ += 1
 
         # Remove deleted cars from list
         for index in sorted(removed_idcs, reverse=True):
@@ -122,6 +117,8 @@ class Lane:
     def determine_queue(self, method='default'):
         if method == 'default':
             return self.queue_default_(self.cars)
+        if method == 'Laemmer':
+            return self.queue_laemmer(self.cars)
 
     @staticmethod
     def queue_default_(cars):
@@ -130,6 +127,20 @@ class Lane:
             if car.speed == 0:
                 # Car is stopped in the lane
                 queue_length += car.length
+        return queue_length
+
+    @staticmethod
+    def queue_laemmer_(cars):
+        queue_length = 0
+        for car in cars:
+            if car.speed == 0:
+                # Car is stopped in the lane
+                queue_length += car.length
+            if car.speed > 0 and not car.isPassedLight:
+                time = ((car.location*LANE_LENGTH) - self.queue_length + 0.05)/car.maxspeed
+                if(time <=( (delay * nrCarsInQ) + acctime )):
+                    qlength += car.length + 5
+                    nrCarsInQ += 1
         return queue_length
 
 
