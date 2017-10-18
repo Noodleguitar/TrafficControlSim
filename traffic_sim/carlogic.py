@@ -22,15 +22,16 @@ class Vehicle(pygame.sprite.Sprite):
         self.next_lane = next_lane
         self.id = id_
         self.name = name
-        self.width = self.rect.width
-        self.length = self.rect.height
+        # TODO: better solution to determine length/width
+        self.width = min(self.rect.height, self.rect.width)
+        self.length = max(self.rect.height, self.rect.width)
         self.rect = pygame.Rect(-100, -100, self.rect.width, self.rect.height)
         self.speed = speed
         self.max_speed = max_speed
         self.acceleration = acceleration
         self.turn_rate = turn_rate
         self.braking = braking
-        self.inQ = False
+        # self.inQ = False
         self.turning = False
         self.turning_start = None
         self.reached_destination = False
@@ -58,23 +59,19 @@ class Vehicle(pygame.sprite.Sprite):
 
         elif lane.checklight() == 'green':
             # Light is green, accelerate
-            self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         elif self.passed_light():
             # Already passed the light, accelerate
-            self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         elif (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
               LANE_LIGHT_LOCATION - SAFETY_DISTANCE):
             # Braking now stops before the light
-            self.inQ = True
             self.speed = max(0, self.speed - self.braking)
 
         else:
             # No action required, accelerate
-            self.inQ = False
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         if (previous_car is not None and

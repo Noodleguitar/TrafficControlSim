@@ -88,10 +88,7 @@ class Lane:
         self.car_sprites.add(v)
 
     def update_lane(self, screen):
-        # Clear queue if light is green
-        if self.checklight() == 'green':
-            self.queue_length = 0
-
+        self.queue_length = self.determine_queue(method='default')
         self.update_cars(screen)
 
     def update_cars(self, screen):
@@ -108,9 +105,6 @@ class Lane:
             car.render(screen, self, prev_car)
             prev_car = car
 
-            if car.inQ:
-                self.queue_length += car.length + 5
-
             #  for car in self.cars_sprites:
             #  if not car.inQ and car.isPassedLight:
             #  time = (car.location - queue_length)/car.maxspeed
@@ -124,6 +118,20 @@ class Lane:
 
         # TODO: move drawing somewhere else
         self.car_sprites.draw(screen)
+
+    def determine_queue(self, method='default'):
+        if method == 'default':
+            return self.queue_default_(self.cars)
+
+    @staticmethod
+    def queue_default_(cars):
+        queue_length = 0
+        for car in cars:
+            if car.speed == 0:
+                # Car is stopped in the lane
+                queue_length += car.length
+        return queue_length
+
 
     def checklight(self):
         # TODO: handle None light exception differently
