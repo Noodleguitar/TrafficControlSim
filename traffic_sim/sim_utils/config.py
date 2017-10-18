@@ -1,22 +1,11 @@
 WIDTH = 1600
 HEIGHT = 900
-FRAMERATE = 100
-DEBUG = False
+FRAMERATE = 60
+DEBUG = True
 
 CAR_EVERY_FRAMES = 90
 MIN_GREEN_TIME = 240
 SAFETY_DISTANCE = 0.01
-
-
-# Normal car
-class VehicleCar:
-    name = 'car'
-    speed = 50
-    max_speed = 90
-    acceleration = 1
-    braking = 2
-    turning_rate = 10
-# TODO: other types of vehicles
 
 FACTOR_SPEED = 0.05
 
@@ -28,3 +17,23 @@ ROAD_SEPARATION_WIDTH = 2
 LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'yellow':  (255, 255, 0),
                  'green':   (0, 255, 0)}
+
+
+# Normal car
+class VehicleCar:
+    name = 'car'
+    speed = 50
+    max_speed = 90
+    acceleration = 1
+    braking = 2
+    turning_rate = 10
+
+
+# Truck
+class VehicleTruck:
+    name = 'truck'
+    speed = 50
+    max_speed = 60
+    acceleration = 1
+    braking = 1
+    turning_rate = 90

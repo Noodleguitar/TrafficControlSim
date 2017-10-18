@@ -11,7 +11,7 @@ class Vehicle(pygame.sprite.Sprite):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
 
-        self.changeDirection(direction)
+        self.changeDirection(direction, name)
 
         # Font for debugging purposes
         self.font = pygame.font.SysFont("monospace", 14)
@@ -234,13 +234,13 @@ class Vehicle(pygame.sprite.Sprite):
     #         return True
     #     return False
 
-    def changeDirection(self, direction):
+    def changeDirection(self, direction, vehicle_name):
         self.direction = direction
         if direction == 'E':
-            self.image, self.rect = load_image('car_small_right.png', -1)
+            self.image, self.rect = load_image(vehicle_name + '_right.png', -1)
         if direction == 'W':
-            self.image, self.rect = load_image('car_small_left.png', -1)
+            self.image, self.rect = load_image(vehicle_name + '_left.png', -1)
         if direction == 'N':
-            self.image, self.rect = load_image('car_small_up.png', -1)
+            self.image, self.rect = load_image(vehicle_name + '_up.png', -1)
         if direction == 'S':
-            self.image, self.rect = load_image('car_small_down.png', -1)
+            self.image, self.rect = load_image(vehicle_name + '_down.png', -1)
