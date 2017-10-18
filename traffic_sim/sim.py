@@ -4,11 +4,13 @@ import pygame
 import random
 import datetime as dt
 import time
-from datalogging import DataLogging
 
+import numpy as np
+
+from datalogging import DataLogging
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
-from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar
+from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar, VehicleTruck
 from sim_utils.utils import Coord
 from traffic_controller import Controller
 
@@ -29,6 +31,8 @@ class SimMain:
         # Initialize font
         self.font = pygame.font.SysFont('monospace', 14)
 
+        # Define vehicles to be used
+        self.vehicles = [VehicleCar, VehicleTruck]
         self.intersection = Intersection(center=Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5))
         # Add traffic light
         traffic_lightWE = TrafficLight(green=True, strategy='classic', id_=0)
@@ -121,11 +125,13 @@ class SimMain:
             route = routes[random.randint(0, len(routes) - 1)]
             next_lane = (self.intersection.lanes[route[1]], route[3])
             # Select type of vehicle
-            vehicle = VehicleCar()
+            distribution = [x.spawn_rate for x in self.vehicles]
+            chosen = np.random.choice(self.vehicles, size=1, p=distribution)[0]
+            vehicle = chosen()
             self.intersection.lanes[route[0]].addCar(
                 Vehicle(
                     vehicle.name, vehicle.speed, vehicle.max_speed,
-                    vehicle.acceleration, vehicle.braking, vehicle.turning_rate,
+                    vehicle.acceleration, vehicle.braking, vehicle.turning_rate, vehicle.scale,
                     route[2], self.dataStorage,
                     next_lane, debug=DEBUG)
             )

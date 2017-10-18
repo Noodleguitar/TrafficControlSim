@@ -27,6 +27,8 @@ class VehicleCar:
     acceleration = 1
     braking = 2
     turning_rate = 10
+    scale = (0.9, 0.9)
+    spawn_rate = 0.9
 
 
 # Truck
@@ -37,3 +39,5 @@ class VehicleTruck:
     acceleration = 1
     braking = 1
     turning_rate = 90
+    scale = (0.45, 0.45)
+    spawn_rate = 0.1

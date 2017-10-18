@@ -9,4 +9,4 @@ x Remove cars from lane when switching to another
 LOW priority:
 - Create Render class
 - Vector class for easier mathing
-- Rotating cars instead of reloading image
+- Rotating cars instead of reloading image (allowing non-uniform scaling of vehicles)

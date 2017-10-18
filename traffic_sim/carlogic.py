@@ -6,12 +6,12 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
-                 acceleration: int, braking: int, turn_rate: int,
+                 acceleration: int, braking: int, turn_rate: int, scale: tuple,
                  direction: str,  dataStorage, next_lane, id_: int = -1, debug=False):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
 
-        self.changeDirection(direction, name)
+        self.changeDirection(direction, name, scale)
 
         # Font for debugging purposes
         self.font = pygame.font.SysFont("monospace", 14)
@@ -22,6 +22,7 @@ class Vehicle(pygame.sprite.Sprite):
         self.next_lane = next_lane
         self.id = id_
         self.name = name
+        self.scale = scale
         # TODO: better solution to determine length/width
         self.width = min(self.rect.height, self.rect.width)
         self.length = max(self.rect.height, self.rect.width)
@@ -96,7 +97,7 @@ class Vehicle(pygame.sprite.Sprite):
                         keep_car = False
                         self.next_lane[0].addCar(
                             Vehicle(self.name, self.speed, self.max_speed,
-                                    self.acceleration, self.braking, self.turn_rate,
+                                    self.acceleration, self.braking, self.turn_rate, self.scale,
                                     self.next_lane[1], self.dataStorage, None, debug=self.debug)
                         )
                 else:
@@ -231,7 +232,7 @@ class Vehicle(pygame.sprite.Sprite):
     #         return True
     #     return False
 
-    def changeDirection(self, direction, vehicle_name):
+    def changeDirection(self, direction, vehicle_name, scale):
         self.direction = direction
         if direction == 'E':
             self.image, self.rect = load_image(vehicle_name + '_right.png', -1)
@@ -241,3 +242,9 @@ class Vehicle(pygame.sprite.Sprite):
             self.image, self.rect = load_image(vehicle_name + '_up.png', -1)
         if direction == 'S':
             self.image, self.rect = load_image(vehicle_name + '_down.png', -1)
+
+        # Scale original image
+        new_width = int(self.rect.width * scale[0])
+        new_height = int(self.rect.height * scale[1])
+        self.image = pygame.transform.scale(self.image, (new_width, new_height))
+        self.rect = self.image.get_rect()
