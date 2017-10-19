@@ -126,7 +126,7 @@ class Lane:
         for car in cars:
             if car.speed == 0:
                 # Car is stopped in the lane
-                queue_length += car.length
+                queue_length += 1
         return queue_length
 
     @staticmethod
