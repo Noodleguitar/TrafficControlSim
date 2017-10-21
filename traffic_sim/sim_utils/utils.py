@@ -12,6 +12,17 @@ def get_screen_center():
     return Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5)
 
 
+def get_rotation(direction: str):
+    if direction == 'E':
+        return 0
+    if direction == 'W':
+        return 180
+    if direction == 'N':
+        return 90
+    if direction == 'S':
+        return 270
+
+
 def stopping_distance(speed, braking):
     frames = speed / braking
     # # s = 0.5 * a * t^2

@@ -1,6 +1,6 @@
 HIGH priority:
 x Last car in queue does not brake enough when light goes green
-- After some time simulating, cars start to run red lights for some reason.
+? After some time simulating, cars start to run red lights for some reason.
 - Make sure cars entering away-lanes are not counted towards reaching destinations.
 x Remove cars from lane when switching to another
 - Allowing multiple green lights simultaneously
@@ -9,4 +9,4 @@ x Remove cars from lane when switching to another
 LOW priority:
 - Create Render class
 - Vector class for easier mathing
-- Rotating cars instead of reloading image (allowing non-uniform scaling of vehicles)
+x Rotating cars instead of reloading image (allowing non-uniform scaling of vehicles)
