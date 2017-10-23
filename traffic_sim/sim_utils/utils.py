@@ -1,5 +1,7 @@
 from collections import namedtuple
 import os
+
+import numpy as np
 import pygame
 from pygame.locals import RLEACCEL
 
@@ -111,3 +113,10 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
+
+
+def chance(probability):
+    value = np.random.rand(1)[0]
+    if value < probability:
+        return True
+    return False

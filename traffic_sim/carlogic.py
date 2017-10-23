@@ -2,7 +2,7 @@ import copy
 
 import pygame
 
-from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE
+from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE, EMERGENCY_RED_MAX_SPEED
 from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position, get_rotation
 
 
@@ -47,7 +47,7 @@ class Vehicle(pygame.sprite.Sprite):
             # No direction change, zero turn rate
             self.turn_rate = 0
 
-    def update_cycle(self, lane, queue_length, previous_car):
+    def update_cycle(self, lane, queue_length, previous_car, emergency_active):
         self.ticks += 1
 
         if self.turning and self.direction_change(self.next_lane, self.direction):
@@ -118,8 +118,53 @@ class Vehicle(pygame.sprite.Sprite):
             return False
         return True
 
-    def render(self, screen, lane, prev_car):
-        start, end = get_lane_points(lane, get_screen_center(), center_line=True)
+    def update_emergency(self, lane):
+        if self.position < (LANE_LIGHT_LOCATION - 0.15):
+            # Accelerate towards max speed
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
+        elif lane.checklight() != 'green':
+            # Slow down to maximum red traversing speed
+            self.speed = max(EMERGENCY_RED_MAX_SPEED, self.speed - self.braking)
+        else:
+            # Accelerate
+            self.speed = min(self.speed + self.acceleration, self.max_speed)
+
+        self.position += (self.speed * FACTOR_SPEED) / LANE_LENGTH
+
+        # TODO: Below is copied from update_cycle()
+        keep_car = True
+        if self.position > 1.0:
+            if self.next_lane:
+                # Car transitions to next lane
+                if self.turning:
+                    if self.ticks - self.turning_start > self.turn_rate:
+                        # Car is done turning, remove car, add one to next lane
+                        self.turning = False
+                        keep_car = False
+                        self.next_lane[0].add_emerg_vehicle(
+                            Vehicle(self.name, self.speed, self.max_speed,
+                                    self.acceleration, self.braking, self.turn_rate, self.scale,
+                                    self.next_lane[1], self.dataStorage, None, debug=self.debug)
+                        )
+                else:
+                    # Start turning on the intersection
+                    self.turning = True
+                    self.turning_start = self.ticks
+            else:
+                # Car has reached destination
+                keep_car = False
+
+        if not keep_car:
+            # Remove sprite from group
+            self.kill()
+            return False
+        return True
+
+    def render(self, screen, lane, prev_car, side_parked=False):
+        if side_parked:
+            start, end = get_lane_points(lane, get_screen_center(), order_offset=1)
+        else:
+            start, end = get_lane_points(lane, get_screen_center(), center_line=True)
 
         if self.direction == 'E':
             self.rect.center = (start.x + self.position * LANE_LENGTH,
@@ -140,7 +185,8 @@ class Vehicle(pygame.sprite.Sprite):
                 previous_id = prev_car.id
             # debug_output = str(self.id) + ', ' + str(previous_id)
             # debug_output = str(self.direction)
-            debug_output = str(self.queue_length)
+            # debug_output = str(self.queue_length)
+            debug_output = str(lane.emergency_active)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
             screen.blit(text, self.rect.bottomright)

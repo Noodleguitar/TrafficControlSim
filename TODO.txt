@@ -10,3 +10,5 @@ LOW priority:
 - Create Render class
 - Vector class for easier mathing
 x Rotating cars instead of reloading image (allowing non-uniform scaling of vehicles)
+- Floats for acceleration/braking for more precision
+- Cars ignore collisions on lanes away from the intersection

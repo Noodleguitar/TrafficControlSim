@@ -76,8 +76,10 @@ class Lane:
         self.light = light
         self.car_sprites = pygame.sprite.Group()
         self.cars = list()
+        self.emerg_vehicles = list()
         self.queue_length = 0
         self.delay = 15
+        self.emergency_active = False
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
@@ -88,9 +90,17 @@ class Lane:
         self.cars[-1].id = len(self.cars) - 1
         self.car_sprites.add(v)
 
+    def add_emerg_vehicle(self, v: Vehicle):
+        self.emerg_vehicles.append(v)
+        self.car_sprites.add(v)
+        self.emergency_active = True
+
     def update_lane(self, screen):
         self.queue_length = self.determine_queue(method='default')
         self.update_cars(screen)
+        self.update_emerg_vehicles(screen)
+        # TODO: move drawing somewhere else
+        self.car_sprites.draw(screen)
 
     def update_cars(self, screen):
         removed_idcs = list()
@@ -100,19 +110,32 @@ class Lane:
                 assert prev_car is not car
 
             # Apply motion of the car
-            if not car.update_cycle(self, self.queue_length, prev_car):
+            if not car.update_cycle(self, self.queue_length, prev_car, self.emergency_active):
                 # Car should be deleted
                 removed_idcs.append(i)
-            car.render(screen, self, prev_car)
+            car.render(screen, self, prev_car, self.emergency_active)
             prev_car = car
-
 
         # Remove deleted cars from list
         for index in sorted(removed_idcs, reverse=True):
             del self.cars[index]
 
-        # TODO: move drawing somewhere else
-        self.car_sprites.draw(screen)
+    def update_emerg_vehicles(self, screen):
+        removed_idcs = list()
+        for i, veh in enumerate(self.emerg_vehicles):
+            # Apply motion of the car
+            if not veh.update_emergency(self):
+                # Car should be deleted
+                removed_idcs.append(i)
+            veh.render(screen, self, None, False)
+
+        # Remove deleted cars from list
+        # TODO: check if this works
+        for index in sorted(removed_idcs, reverse=True):
+            del self.emerg_vehicles[index]
+
+        if len(self.emerg_vehicles) == 0:
+            self.emergency_active = False
 
     def determine_queue(self, method='default'):
         if method == 'default':
@@ -142,7 +165,6 @@ class Lane:
                     qlength += car.length + 5
                     nrCarsInQ += 1
         return queue_length
-
 
     def checklight(self):
         # TODO: handle None light exception differently

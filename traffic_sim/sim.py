@@ -10,8 +10,9 @@ import numpy as np
 from datalogging import DataLogging
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
-from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar, VehicleTruck
-from sim_utils.utils import Coord
+from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar, VehicleTruck, \
+    VehicleEmergency
+from sim_utils.utils import Coord, chance
 from traffic_controller import Controller
 
 
@@ -135,6 +136,17 @@ class SimMain:
                     route[2], self.dataStorage,
                     next_lane, debug=DEBUG)
             )
+
+            # Potentially add emergency vehicle according to chance roll
+            if chance(VehicleEmergency().spawn_rate):
+                vehicle = VehicleEmergency()
+                self.intersection.lanes[route[0]].add_emerg_vehicle(
+                    Vehicle(
+                        vehicle.name, vehicle.speed, vehicle.max_speed,
+                        vehicle.acceleration, vehicle.braking, vehicle.turning_rate, vehicle.scale,
+                        route[2], self.dataStorage,
+                        next_lane, debug=DEBUG)
+                )
 
         self.carframecounter += 1
         if self.carframecounter == CAR_EVERY_FRAMES:
