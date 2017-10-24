@@ -42,12 +42,14 @@ class Vehicle(pygame.sprite.Sprite):
         self.ticks = 0
 
         self.debug = debug
+        # TODO: debug
+        self.queue_length = 0
 
         if self.next_lane and not self.direction_change(self.next_lane, self.direction):
             # No direction change, zero turn rate
             self.turn_rate = 0
 
-    def update_cycle(self, lane, queue_length, previous_car, emergency_active):
+    def update_cycle(self, lane, queue_length, previous_car, emergency_active, intersection_blocked):
         self.ticks += 1
 
         if self.turning and self.direction_change(self.next_lane, self.direction):
@@ -62,11 +64,11 @@ class Vehicle(pygame.sprite.Sprite):
             self.speed = max(0, self.speed - self.braking)
 
         elif lane.checklight() == 'green':
-            # Light is green, accelerate
+            # Light is green; accelerate
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         elif self.passed_light():
-            # Already passed the light, accelerate
+            # Already passed the light; accelerate
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
         elif (stopping_position(self.position, max(self.length, self.width), self.speed, self.braking) >
@@ -78,8 +80,14 @@ class Vehicle(pygame.sprite.Sprite):
             # No action required, accelerate
             self.speed = min(self.speed + self.acceleration, self.max_speed)
 
+        if (lane.towards and
+            intersection_blocked and
+            LANE_LIGHT_LOCATION > self.position > (LANE_LIGHT_LOCATION - 0.05)):
+            # Car is about to enter intersection but emergency is crossing; brake
+            self.speed = max(0, self.speed - self.braking)
+
         if (previous_car is not None and
-            previous_car.position > LANE_LIGHT_LOCATION and
+            previous_car.position >LANE_LIGHT_LOCATION and
             self.direction_change(previous_car.next_lane, previous_car.direction)):
             # Car in front is turning, wait at light
             self.speed = max(0, self.speed - self.braking)
@@ -119,6 +127,8 @@ class Vehicle(pygame.sprite.Sprite):
         return True
 
     def update_emergency(self, lane):
+        self.ticks += 1
+
         if self.position < (LANE_LIGHT_LOCATION - 0.15):
             # Accelerate towards max speed
             self.speed = min(self.speed + self.acceleration, self.max_speed)
@@ -185,8 +195,8 @@ class Vehicle(pygame.sprite.Sprite):
                 previous_id = prev_car.id
             # debug_output = str(self.id) + ', ' + str(previous_id)
             # debug_output = str(self.direction)
-            # debug_output = str(self.queue_length)
-            debug_output = str(lane.emergency_active)
+            debug_output = str(self.queue_length)
+            # debug_output = str(lane.emergency_active)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
             screen.blit(text, self.rect.bottomright)

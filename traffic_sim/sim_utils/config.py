@@ -1,9 +1,9 @@
 WIDTH = 1600
 HEIGHT = 900
 FRAMERATE = 60
-DEBUG = True
+DEBUG = False
 
-CAR_EVERY_FRAMES = 90
+CAR_EVERY_FRAMES = 70
 MIN_GREEN_TIME = 240
 EMERGENCY_RED_MAX_SPEED = 25
 SAFETY_DISTANCE = 0.01
@@ -14,7 +14,8 @@ LANE_LIGHT_LOCATION = 0.95
 LANE_WIDTH = 35
 LANE_LENGTH = 1000
 ROAD_SEPARATION_WIDTH = 2
-METHOD = "Laemmer"
+# Method to apply to traffic control, 'default' or 'Laemmer'
+METHOD = "default"
 
 LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'yellow':  (255, 255, 0),
@@ -54,4 +55,4 @@ class VehicleEmergency:
     braking = 3
     turning_rate = 5
     scale = (0.9, 0.9)
-    spawn_rate = 0.1
+    spawn_rate = 0.05

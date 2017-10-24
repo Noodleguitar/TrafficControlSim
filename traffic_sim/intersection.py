@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 
 from carlogic import Vehicle
@@ -19,8 +20,12 @@ class Intersection:
         self.lanes.append(Lane(direction, towards, order, light=light))
 
     def update_lanes(self, screen):
+        emergency_lanes = [lane.emergency_near_intersection() for lane in self.lanes]
+        self.blocked = np.any(emergency_lanes)
+
         for lane in self.lanes:
-            lane.update_lane(screen)
+            lane.update_lane(screen, self.blocked)
+        self.blocked = False
 
     def render(self, surface):
         for lane in self.lanes:
@@ -95,14 +100,14 @@ class Lane:
         self.car_sprites.add(v)
         self.emergency_active = True
 
-    def update_lane(self, screen):
-        self.queue_length = self.determine_queue(method='default')
-        self.update_cars(screen)
+    def update_lane(self, screen, intersection_blocked):
+        self.queue_length = self.determine_queue(method=METHOD)
+        self.update_cars(screen, intersection_blocked)
         self.update_emerg_vehicles(screen)
         # TODO: move drawing somewhere else
         self.car_sprites.draw(screen)
 
-    def update_cars(self, screen):
+    def update_cars(self, screen, intersection_blocked):
         removed_idcs = list()
         prev_car = None
         for i, car in enumerate(self.cars):
@@ -110,7 +115,7 @@ class Lane:
                 assert prev_car is not car
 
             # Apply motion of the car
-            if not car.update_cycle(self, self.queue_length, prev_car, self.emergency_active):
+            if not car.update_cycle(self, self.queue_length, prev_car, self.emergency_active, intersection_blocked):
                 # Car should be deleted
                 removed_idcs.append(i)
             car.render(screen, self, prev_car, self.emergency_active)
@@ -130,12 +135,21 @@ class Lane:
             veh.render(screen, self, None, False)
 
         # Remove deleted cars from list
-        # TODO: check if this works
         for index in sorted(removed_idcs, reverse=True):
             del self.emerg_vehicles[index]
 
         if len(self.emerg_vehicles) == 0:
             self.emergency_active = False
+
+    def emergency_near_intersection(self):
+        if not self.towards:
+            return False
+
+        for em in self.emerg_vehicles:
+            if em.position > (LANE_LIGHT_LOCATION - 0.15) or em.position > LANE_LIGHT_LOCATION:
+                # Emergency vehicle is close to intersection
+                return True
+        return False
 
     def determine_queue(self, method='default'):
         if method == 'default':
