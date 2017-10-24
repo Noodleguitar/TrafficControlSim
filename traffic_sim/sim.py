@@ -58,7 +58,7 @@ class SimMain:
         # Create the background
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
-        self.background.fill((0, 0, 0))
+        self.background.fill((20, 50, 50))
 
         running = True
         while running:
