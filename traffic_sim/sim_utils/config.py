@@ -15,7 +15,7 @@ LANE_WIDTH = 35
 LANE_LENGTH = 1000
 ROAD_SEPARATION_WIDTH = 2
 # Method to apply to traffic control, 'default' or 'Laemmer'
-METHOD = "default"
+METHOD = "Laemmer"
 
 LIGHT_COLOURS = {'red':     (255, 0, 0),
                  'yellow':  (255, 255, 0),

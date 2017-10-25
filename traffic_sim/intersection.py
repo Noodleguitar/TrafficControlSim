@@ -49,7 +49,7 @@ class TrafficLight:
         self.strategy = strategy
         self.framerateCount = 0
         self.framesInRotation = 1200
-        self.greentime = self.framesInRotation / 6
+        self.greenTime = self.framesInRotation / 6
         self.yellow_time = 130
 
     def get_current_light_time(self):
@@ -64,6 +64,12 @@ class TrafficLight:
         if self.state == 'yellow' and self.framerateCount >= self.yellow_time:
             # Change to red
             self.set_state('red')
+
+    def setGreentime(self, greentime: int):
+        self.greenTime = greentime
+
+    def getGreentime(self):
+        return self.greenTime
 
 
 class Lane:
@@ -85,6 +91,7 @@ class Lane:
         self.queue_length = 0
         self.delay = 15
         self.emergency_active = False
+        self.greenTime = 0
 
         if (light is not None) and (not towards):
             raise ValueError('[Lane.__init__] Attempting to add a traffic light to a lane going away from the '
@@ -151,11 +158,11 @@ class Lane:
                 return True
         return False
 
-    def determine_queue(self, method='default'):
+    def determine_queue(self, method='Laemmer'):
         if method == 'default':
             return self.queue_default_(self.cars)
         if method == 'Laemmer':
-            return self.queue_laemmer(self.cars)
+            return self.queue_laemmer_(self.cars)
 
     @staticmethod
     def queue_default_(cars):
@@ -166,19 +173,26 @@ class Lane:
                 queue_length += 1
         return queue_length
 
-    @staticmethod
-    def queue_laemmer_(cars):
+    #@staticmethod
+    def queue_laemmer_(self,cars):
+        nrCarsInQ =0
         queue_length = 0
         for car in cars:
             if car.speed == 0:
                 # Car is stopped in the lane
                 queue_length += car.length
-            if car.speed > 0 and not car.isPassedLight:
-                time = ((car.location*LANE_LENGTH) - self.queue_length + 0.05)/car.maxspeed
-                if(time <=( (delay * nrCarsInQ) + acctime )):
-                    qlength += car.length + 5
+                nrCarsInQ += 1
+            if car.speed > 0:
+                time = ((car.position*LANE_LENGTH) - queue_length + 0.05)/car.max_speed
+                if(time <=( (50 * nrCarsInQ) + car.acceleration)):
+                    queue_length += car.length + 5
                     nrCarsInQ += 1
-        return queue_length
+        #print(queue_length)
+        if self.light is not None:
+            self.light.setGreentime(queue_length)
+        #self.setGreentime(300)
+
+        return nrCarsInQ
 
     def checklight(self):
         # TODO: handle None light exception differently

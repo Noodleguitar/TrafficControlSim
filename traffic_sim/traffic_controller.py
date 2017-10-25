@@ -1,6 +1,6 @@
 import operator
 
-from sim_utils.config import MIN_GREEN_TIME
+from sim_utils.config import MIN_GREEN_TIME, METHOD
 
 # TODO: find out which traffic lights conflict with each other to potentially allow double green lights
 
@@ -15,17 +15,25 @@ class Controller:
     def update(self):
         # Sort lanes with traffic lights by queue time, descending
         self.light_lanes = sorted(self.light_lanes, key=operator.attrgetter('queue_length'), reverse=True)
-
         for i, l in enumerate(self.light_lanes):
             if l.checklight() == 'yellow':
                 # Yellow light on one of the lanes, no action taken
                 return
             if l.checklight() == 'green':
-                if i > 0 and l.light.get_current_light_time() > MIN_GREEN_TIME:
-                    # Lane is not the highest priority at this moment and minimum green time expired,
-                    # light can be switched to yellow.
-                    l.light.set_state('yellow')
-                return
+                if METHOD == "Laemmer":
+                    if i > 0 and l.light.get_current_light_time() > l.light.getGreentime():
+                        print(l.light.getGreentime())
+                        print(l.light.id)
+                        # Lane is not the highest priority at this moment and minimum green time expired,
+                        # light can be switched to yellow.
+                        l.light.set_state('yellow')
+                    return
+                else:
+                    if i > 0 and l.light.get_current_light_time() > MIN_GREEN_TIME:
+                        # Lane is not the highest priority at this moment and minimum green time expired,
+                        # light can be switched to yellow.
+                        l.light.set_state('yellow')
+                    return
 
         # All lights are red, set longest queue to green
         self.light_lanes[0].light.set_state('green')

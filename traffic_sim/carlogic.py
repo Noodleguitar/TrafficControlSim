@@ -2,7 +2,7 @@ import copy
 
 import pygame
 
-from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE, EMERGENCY_RED_MAX_SPEED
+from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE, EMERGENCY_RED_MAX_SPEED, METHOD
 from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position, get_rotation
 
 
