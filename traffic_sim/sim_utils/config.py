@@ -1,9 +1,13 @@
 WIDTH = 1778
 HEIGHT = 1000
-FRAMERATE = 60
+FRAMERATE = 300
 DEBUG = False
+# Duration of data collection period given as number of frames
+RUN_TIME = 54000
+# Run identifier for results exporting
+TEST_RUN_NUMBER = 0
 
-CAR_EVERY_FRAMES = 70
+CAR_EVERY_FRAMES = 88
 MIN_GREEN_TIME = 240
 EMERGENCY_RED_MAX_SPEED = 25
 SAFETY_DISTANCE = 0.01

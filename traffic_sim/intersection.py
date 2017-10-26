@@ -133,7 +133,7 @@ class Lane:
                 assert prev_car is not car
 
             # Apply motion of the car
-            if not car.update_cycle(self, self.queue_length, prev_car, self.emergency_active, intersection_blocked):
+            if not car.update_cycle(self, self.queue_length, prev_car, intersection_blocked):
                 # Car should be deleted
                 removed_idcs.append(i)
             car.render(screen, self, prev_car, self.emergency_active)

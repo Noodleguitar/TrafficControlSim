@@ -4,6 +4,8 @@ import pygame
 import random
 import datetime as dt
 import time
+import os
+import pickle
 
 import numpy as np
 
@@ -11,7 +13,7 @@ from datalogging import DataLogging
 from carlogic import Vehicle
 from intersection import Intersection, TrafficLight
 from sim_utils.config import WIDTH, HEIGHT, FRAMERATE, CAR_EVERY_FRAMES, DEBUG, VehicleCar, VehicleTruck, \
-    VehicleEmergency
+    VehicleEmergency, RUN_TIME, METHOD, TEST_RUN_NUMBER
 from sim_utils.utils import Coord, chance
 from traffic_controller import Controller
 
@@ -54,6 +56,7 @@ class SimMain:
 
         self.frame_timing = pygame.time.Clock()
         self.carframecounter = 0
+        self.total_frames = 0
 
     def main_loop(self):
         # Create the background
@@ -87,6 +90,16 @@ class SimMain:
             # pygame.time.delay(int(max(0, (1.0 / FRAMERATE) - frame_time) * 1000))
             time.sleep(max(0, (1.0 / FRAMERATE) - frame_time))
             self.frame_timing.tick()
+            self.total_frames += 1
+
+            if self.total_frames > RUN_TIME:
+                running = False
+
+        # Store results to a pickle file
+        results = self.dataStorage.get_results(np.median)
+        os.makedirs('results', exist_ok=True)
+        name = os.path.join('results/', METHOD + '_' + str(TEST_RUN_NUMBER) + '.pkl')
+        pickle.dump(results, open(name, 'wb'))
 
     @staticmethod
     def handle_events():

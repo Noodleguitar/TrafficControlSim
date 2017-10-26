@@ -11,7 +11,7 @@ from sim_utils.utils import load_image, get_screen_center, get_lane_points, stop
 class Vehicle(pygame.sprite.Sprite):
     def __init__(self, name: str, speed: int, max_speed: int,
                  acceleration: int, braking: int, turn_rate: int, scale: tuple,
-                 direction: str,  dataStorage, next_lane, id_: int = -1, debug=False):
+                 direction: str,  dataStorage, next_lane, id_: int = -1, time_waited: int = 0, debug=False):
         self.dataStorage = dataStorage
         pygame.sprite.Sprite.__init__(self)
 
@@ -37,11 +37,11 @@ class Vehicle(pygame.sprite.Sprite):
         self.acceleration = acceleration
         self.turn_rate = turn_rate
         self.braking = braking
-        # self.inQ = False
         self.turning = False
         self.turning_start = None
         self.reached_destination = False
         self.ticks = 0
+        self.wait_time = time_waited
 
         self.debug = debug
         # TODO: debug
@@ -51,8 +51,12 @@ class Vehicle(pygame.sprite.Sprite):
             # No direction change, zero turn rate
             self.turn_rate = 0
 
-    def update_cycle(self, lane, queue_length, previous_car, emergency_active, intersection_blocked):
+    def update_cycle(self, lane, queue_length, previous_car, intersection_blocked):
         self.ticks += 1
+
+        # If car is stopped in queue, increase wait time
+        if lane.towards and self.speed == 0:
+            self.wait_time += 1
 
         if self.turning and self.direction_change(self.next_lane, self.direction):
             self.speed = 0
@@ -111,7 +115,8 @@ class Vehicle(pygame.sprite.Sprite):
                         self.next_lane[0].addCar(
                             Vehicle(self.name, self.speed, self.max_speed,
                                     self.acceleration, self.braking, self.turn_rate, self.scale,
-                                    self.next_lane[1], self.dataStorage, None, debug=self.debug)
+                                    self.next_lane[1], self.dataStorage, None,
+                                    time_waited=self.wait_time, debug=self.debug)
                         )
                 else:
                     # Start turning on the intersection
@@ -119,7 +124,7 @@ class Vehicle(pygame.sprite.Sprite):
                     self.turning_start = self.ticks
             else:
                 # Car has reached destination
-                self.dataStorage.add_destination(self.direction)
+                self.dataStorage.add_destination(self.direction, self.ticks, self.wait_time)
                 keep_car = False
 
         if not keep_car:
