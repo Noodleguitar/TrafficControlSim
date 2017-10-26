@@ -108,7 +108,13 @@ class Lane:
         self.emergency_active = True
 
     def update_lane(self, screen, intersection_blocked):
+        # Update traffic light assigned to this lane (if any)
+        if self.light is not None:
+            self.light.frameUpdate()
+
+        # Determine current queue_length
         self.queue_length = self.determine_queue(method=METHOD)
+        # Update vehicles
         self.update_cars(screen, intersection_blocked)
         self.update_emerg_vehicles(screen)
         # TODO: move drawing somewhere else

@@ -69,10 +69,6 @@ class SimMain:
             self.screen.blit(self.background, (0, 0))
 
             # Update traffic light and car
-            self.intersection.lanes[1].light.frameUpdate()
-            self.intersection.lanes[2].light.frameUpdate()
-            self.intersection.lanes[5].light.frameUpdate()
-            self.intersection.lanes[7].light.frameUpdate()
             self.maybe_add_car()
 
             self.controller.update()
