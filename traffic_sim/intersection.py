@@ -185,6 +185,7 @@ class Lane:
         for car in cars:
             time_to_clear_q += car.length / car.max_speed
             time_to_clear_q += (car.max_speed - car.speed) / car.acceleration
+            time_to_clear_q += car.turn_rate
         if self.light is not None:
             self.light.setGreentime(time_to_clear_q)
 
