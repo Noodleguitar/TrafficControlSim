@@ -189,11 +189,14 @@ class Lane:
         for car in cars:
             time_to_clear_q += car.length / car.max_speed
             time_to_clear_q += (car.max_speed - car.speed) / car.acceleration
+            time_to_clear_q += car.turn_rate
+
         # Set light green time if it has not been set already
         if self.light is not None and not self.light.is_green_set():
             self.light.setGreentime(time_to_clear_q)
 
-        return len(cars)
+        # The (esitmated) time to clear the lane determines the queue length
+        return time_to_clear_q
 
     def checklight(self):
         # TODO: handle None light exception differently
