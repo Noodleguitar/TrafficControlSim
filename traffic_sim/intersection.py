@@ -40,22 +40,24 @@ class Intersection:
 
 
 class TrafficLight:
-    def __init__(self, green: bool, strategy: str, id_: int):
-        if green:
-            self.state = 'green'
-        else:
-            self.state = 'red'
+    def __init__(self, strategy: str, id_: int):
         self.id = id_
+        self.state = 'red'
         self.strategy = strategy
         self.framerateCount = 0
         self.framesInRotation = 1200
         self.greenTime = self.framesInRotation / 6
         self.yellow_time = 130
+        self.green_set = False
 
     def get_current_light_time(self):
         return self.framerateCount
 
     def set_state(self, state):
+        if state == 'green':
+            self.green_set = True
+        else:
+            self.green_set = False
         self.state = state
         self.framerateCount = 0
 
@@ -70,6 +72,9 @@ class TrafficLight:
 
     def getGreentime(self):
         return self.greenTime
+
+    def is_green_set(self):
+        return self.green_set
 
 
 class Lane:
@@ -179,13 +184,13 @@ class Lane:
                 queue_length += 1
         return queue_length
 
-    #@staticmethod
     def queue_laemmer_(self, cars):
         time_to_clear_q = 0
         for car in cars:
             time_to_clear_q += car.length / car.max_speed
             time_to_clear_q += (car.max_speed - car.speed) / car.acceleration
-        if self.light is not None:
+        # Set light green time if it has not been set already
+        if self.light is not None and not self.light.is_green_set():
             self.light.setGreentime(time_to_clear_q)
 
         return len(cars)

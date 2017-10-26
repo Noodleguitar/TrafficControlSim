@@ -193,9 +193,12 @@ class Vehicle(pygame.sprite.Sprite):
             previous_id = -1
             if prev_car is not None:
                 previous_id = prev_car.id
+            debug_output = 'None'
             # debug_output = str(self.id) + ', ' + str(previous_id)
             # debug_output = str(self.direction)
-            debug_output = str(self.queue_length)
+            # debug_output = str(self.queue_length)
+            if lane.light is not None:
+                debug_output = str(lane.light.getGreentime())
             # debug_output = str(lane.emergency_active)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))

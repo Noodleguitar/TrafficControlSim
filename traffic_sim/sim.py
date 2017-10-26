@@ -36,10 +36,10 @@ class SimMain:
         self.vehicles = [VehicleCar, VehicleTruck]
         self.intersection = Intersection(center=Coord(x=WIDTH * 0.5, y=HEIGHT * 0.5))
         # Add traffic light
-        traffic_lightWE = TrafficLight(green=True, strategy='classic', id_=0)
-        traffic_lightEW = TrafficLight(green=False, strategy='classic', id_=1)
-        traffic_lightSN = TrafficLight(green=False, strategy='classic', id_=2)
-        traffic_lightNS = TrafficLight(green=False, strategy='classic', id_=3)
+        traffic_lightWE = TrafficLight(strategy='classic', id_=0)
+        traffic_lightEW = TrafficLight(strategy='classic', id_=1)
+        traffic_lightSN = TrafficLight(strategy='classic', id_=2)
+        traffic_lightNS = TrafficLight(strategy='classic', id_=3)
         # Add a few dummy lanes
         self.intersection.add_lane(direction=Coord(1, 0), towards=False, order=0) #0
         self.intersection.add_lane(direction=Coord(1, 0), towards=True, order=0, light=traffic_lightWE) #1
