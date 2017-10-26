@@ -7,6 +7,8 @@ CAR_EVERY_FRAMES = 70
 MIN_GREEN_TIME = 240
 EMERGENCY_RED_MAX_SPEED = 25
 SAFETY_DISTANCE = 0.01
+# Maximum distance between light and car in which communication is possible
+COMMUNICATION_DISTANCE = 0.7
 
 FACTOR_SPEED = 0.05
 

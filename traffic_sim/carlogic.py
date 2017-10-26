@@ -2,8 +2,10 @@ import copy
 
 import pygame
 
-from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE, EMERGENCY_RED_MAX_SPEED, METHOD
-from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position, get_rotation
+from sim_utils.config import LANE_LIGHT_LOCATION, LANE_LENGTH, FACTOR_SPEED, SAFETY_DISTANCE, EMERGENCY_RED_MAX_SPEED, \
+    METHOD
+from sim_utils.utils import load_image, get_screen_center, get_lane_points, stopping_position, get_rotation, \
+    acceleration_time
 
 
 class Vehicle(pygame.sprite.Sprite):
@@ -199,6 +201,8 @@ class Vehicle(pygame.sprite.Sprite):
             # debug_output = str(self.queue_length)
             if lane.light is not None:
                 debug_output = str(round(lane.light.getGreentime(), 2))
+            # debug_output = str(round(acceleration_time(1.0-self.position, self.speed, self.acceleration,
+            #                                            self.max_speed), 2))
             # debug_output = str(lane.emergency_active)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
@@ -206,12 +210,6 @@ class Vehicle(pygame.sprite.Sprite):
 
     def passed_light(self):
         return self.position > LANE_LIGHT_LOCATION
-
-    def before_queue(self, qlength):
-        # TODO
-        if self.position < 0.8:
-            return True
-        return False
 
     def rotate_car(self, angle_start, angle_end, portion):
         current_angle = portion * (angle_end - angle_start)

@@ -1,5 +1,6 @@
 from collections import namedtuple
 import os
+import math
 
 import numpy as np
 import pygame
@@ -25,12 +26,33 @@ def get_rotation(direction: str):
         return 270
 
 
+def acceleration_time(distance, speed, acceleration, max_speed):
+    distance = (distance * LANE_LENGTH) / FACTOR_SPEED
+    speed_diff = max_speed - speed
+    max_speed_time = speed_diff / acceleration
+    # s = v_0*t + 0.5*a*t^2  --->
+    # 0.5*a*t^2 + v_0*t - s = 0
+    # Solve quadratic function and use positive solution
+    distance_time = max(np.polynomial.polynomial.polyroots([-distance, speed, 0.5*acceleration]))
+    if distance_time > max_speed_time:
+        # Max speed is reached before the distance is travelled
+        distance_max_speed = travel_time(speed, max_speed, acceleration)
+        distance_left = distance - distance_max_speed
+        time_left = distance_left / max_speed
+        return max_speed_time + time_left
+    else:
+        return distance_time
+
+
+def travel_time(speed_start, speed_end, acceleration):
+    frames = (speed_end - speed_start) / acceleration
+    return speed_start * frames + 0.5 * acceleration * frames**2
+
+
 def stopping_distance(speed, braking):
     frames = speed / braking
-    # # s = 0.5 * a * t^2
-    # distance = 0.5 * braking * frames
-    # s = frames * speed - 0.5 * speed
-    distance = frames * speed - 0.5 * speed
+    # s = 0.5 * a * t^2
+    distance = 0.5 * braking * frames**2 + frames
     return (distance * FACTOR_SPEED) / LANE_LENGTH
 
 

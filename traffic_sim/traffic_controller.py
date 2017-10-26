@@ -23,8 +23,8 @@ class Controller:
                 if METHOD == "Laemmer":
                     # if i > 0 and l.light.get_current_light_time() > l.light.getGreentime():
                     if l.light.get_current_light_time() > l.light.getGreentime():
-                        # print("current greentime:" + str(l.light.getGreentime()))
-                        # print("current lighttime:" + str(l.light.get_current_light_time()))
+                        print("current greentime:" + str(l.light.getGreentime()))
+                        print("current lighttime:" + str(l.light.get_current_light_time()))
                         # The current set green time has expired, set state to yellow
                         l.light.set_state('yellow')
                     return

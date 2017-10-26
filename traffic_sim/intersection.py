@@ -2,8 +2,8 @@ import numpy as np
 import pygame
 
 from carlogic import Vehicle
-from sim_utils.config import LANE_LIGHT_LOCATION, LIGHT_COLOURS, LANE_WIDTH, LANE_LENGTH, METHOD
-from sim_utils.utils import Coord, get_lane_points
+from sim_utils.config import LANE_LIGHT_LOCATION, LIGHT_COLOURS, LANE_WIDTH, LANE_LENGTH, METHOD, COMMUNICATION_DISTANCE
+from sim_utils.utils import Coord, get_lane_points, acceleration_time
 
 
 class Intersection:
@@ -187,15 +187,23 @@ class Lane:
     def queue_laemmer_(self, cars):
         time_to_clear_q = 0
         for car in cars:
-            time_to_clear_q += car.length / car.max_speed
-            time_to_clear_q += (car.max_speed - car.speed) / car.acceleration
-            time_to_clear_q += car.turn_rate
+            if LANE_LIGHT_LOCATION - car.position > COMMUNICATION_DISTANCE:
+                # Car is too far, don't count towards queue
+                continue
+
+            # Absolute in case the car is past the light
+            distance = abs(1.0 - car.position)
+            # Added in reduction factor relative to number of cars from testing
+            time_to_clear_q += acceleration_time(distance, car.speed, car.acceleration, car.max_speed) * \
+                               max(0.6, (1.0 - len(cars) * 0.045))
+            # two-thirds of the time a car will not go straight, add in turn rate
+            time_to_clear_q += car.turn_rate * 0.67
 
         # Set light green time if it has not been set already
         if self.light is not None and not self.light.is_green_set():
             self.light.setGreentime(time_to_clear_q)
 
-        # The (esitmated) time to clear the lane determines the queue length
+        # The (estimated) time to clear the lane determines the queue length
         return time_to_clear_q
 
     def checklight(self):
