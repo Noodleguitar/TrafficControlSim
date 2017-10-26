@@ -21,11 +21,11 @@ class Controller:
                 return
             if l.checklight() == 'green':
                 if METHOD == "Laemmer":
-                    if i > 0 and l.light.get_current_light_time() > l.light.getGreentime():
+                    # if i > 0 and l.light.get_current_light_time() > l.light.getGreentime():
+                    if l.light.get_current_light_time() > l.light.getGreentime():
                         # print("current greentime:" + str(l.light.getGreentime()))
                         # print("current lighttime:" + str(l.light.get_current_light_time()))
-                        # Lane is not the highest priority at this moment and minimum green time expired,
-                        # light can be switched to yellow.
+                        # The current set green time has expired, set state to yellow
                         l.light.set_state('yellow')
                     return
                 else:

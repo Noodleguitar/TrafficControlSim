@@ -198,7 +198,7 @@ class Vehicle(pygame.sprite.Sprite):
             # debug_output = str(self.direction)
             # debug_output = str(self.queue_length)
             if lane.light is not None:
-                debug_output = str(lane.light.getGreentime())
+                debug_output = str(round(lane.light.getGreentime(), 2))
             # debug_output = str(lane.emergency_active)
 
             text = self.font.render(debug_output, 1, (255, 255, 255), (0, 0, 0))
