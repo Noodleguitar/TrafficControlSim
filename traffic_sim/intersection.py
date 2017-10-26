@@ -174,25 +174,15 @@ class Lane:
         return queue_length
 
     #@staticmethod
-    def queue_laemmer_(self,cars):
-        nrCarsInQ =0
-        queue_length = 0
+    def queue_laemmer_(self, cars):
+        time_to_clear_q = 0
         for car in cars:
-            if car.speed == 0:
-                # Car is stopped in the lane
-                queue_length += car.length
-                nrCarsInQ += 1
-            if car.speed > 0:
-                time = ((car.position*LANE_LENGTH) - queue_length + 0.05)/car.max_speed
-                if(time <=( (50 * nrCarsInQ) + car.acceleration)):
-                    queue_length += car.length + 5
-                    nrCarsInQ += 1
-        #print(queue_length)
+            time_to_clear_q += car.length / car.max_speed
+            time_to_clear_q += (car.max_speed - car.speed) / car.acceleration
         if self.light is not None:
-            self.light.setGreentime(queue_length)
-        #self.setGreentime(300)
+            self.light.setGreentime(time_to_clear_q)
 
-        return nrCarsInQ
+        return len(cars)
 
     def checklight(self):
         # TODO: handle None light exception differently
