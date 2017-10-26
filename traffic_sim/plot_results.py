@@ -25,7 +25,7 @@ axes.hist(results['total_wait'], bins=args.bins, edgecolor='black')
 axes.set_xlabel('Wait time (frames)')
 axes.set_ylabel('Frequency')
 axes.set_title('Distribution of wait times at traffic lights')
-output_name = output_name_base + 'wait_time.jpg'
+output_name = output_name_base + 'wait_time.png'
 fig.savefig(output_name, bbox_inches='tight')
 plt.close(fig)
 
@@ -36,7 +36,7 @@ axes.hist(results['total_travel'], bins=args.bins, color='red', edgecolor='black
 axes.set_xlabel('Travel time (frames)')
 axes.set_ylabel('Frequency')
 axes.set_title('Distribution of travel times')
-output_name = output_name_base + '_travel_time.jpg'
+output_name = output_name_base + '_travel_time.png'
 fig.savefig(output_name, bbox_inches='tight')
 plt.close(fig)
 
