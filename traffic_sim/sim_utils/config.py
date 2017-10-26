@@ -55,4 +55,4 @@ class VehicleEmergency:
     braking = 3
     turning_rate = 5
     scale = (0.9, 0.9)
-    spawn_rate = 0.05
+    spawn_rate = 0.01
