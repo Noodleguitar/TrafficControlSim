@@ -1,11 +1,11 @@
-WIDTH = 1778
-HEIGHT = 1000
-FRAMERATE = 300
+WIDTH = 800
+HEIGHT = 600
+FRAMERATE = 400
 DEBUG = False
 # Duration of data collection period given as number of frames
 RUN_TIME = 54000
 # Run identifier for results exporting
-TEST_RUN_NUMBER = 0
+TEST_RUN_NUMBER = 1
 
 CAR_EVERY_FRAMES = 88
 MIN_GREEN_TIME = 240
